@@ -2,7 +2,13 @@ import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
 const userSchema = new Schema({
-
+email : {
+    type : String,
+    required : true,
+    validate : (value) => {
+        return validator.isEmail(value)
+    }
+},
 password: {
     type: String,
     required: true,
@@ -15,15 +21,6 @@ name : {
     type : String,
     required : true,
     trim : true,
-},
-age : {
-    type : Number,
-    required : true,
-    validate(value){
-        if(value < 1){
-            throw new Error('Tuổi phải lớn hơn 0')
-        }
-    }
 },
 phoneNumber:{
     type : String,
