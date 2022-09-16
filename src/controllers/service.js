@@ -1,11 +1,10 @@
 import Service from "../models/service";
-    // post service
-export const post = async(req, res) => {
+export const createService = async(req, res) => {
         try {
-            const Postservice = await new Service(req.body).save();
-            res.json(Postservice);
+            const service = await new Service(req.body).save();
+            return res.json(service);
         } catch (error) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: error.message
             })
         }

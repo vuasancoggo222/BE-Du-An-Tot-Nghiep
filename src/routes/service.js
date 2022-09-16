@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { post } from "../controllers/service";
+import { createService } from "../controllers/service";
 
 const router = Router();
-router.post('/service', post)
+router.post('/service', createService)
 export default router;
