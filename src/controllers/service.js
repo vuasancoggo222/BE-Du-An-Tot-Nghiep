@@ -1,7 +1,5 @@
-import service from "../models/service";
-import Service from "../models/service";
-import { addNewDocument } from "../ultils/newDocument";
 
+import Service from "../models/service";
 export const createService = async(req, res) => {
     try {
         const service = await new Service(req.body).save();
