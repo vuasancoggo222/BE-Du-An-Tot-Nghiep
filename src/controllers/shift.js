@@ -13,5 +13,10 @@ export const getListShift = async (req, res) => {
   try {
     const shift = await Shift.find({}).populate("timeBook.shift").exec();
     return res.json(shift);
-  } catch (error) {}
+  } catch (error) {
+    return res.status(400).json({
+      error : error.message,
+      message : 'Có lỗi xảy ra'
+    })
+  }
 };
