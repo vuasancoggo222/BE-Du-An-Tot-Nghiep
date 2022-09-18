@@ -20,3 +20,14 @@ export const getListShift = async (req, res) => {
     });
   }
 };
+
+export const deleteShift = async (req, res) => {
+  try {
+    const shift = await Shift.findByIdAndDelete({ _id: req.params.id }).exec();
+    return res.json(shift);
+  } catch (error) {
+    return res.status(400).json({
+      message: error.message,
+    });
+  }
+};
