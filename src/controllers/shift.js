@@ -9,14 +9,16 @@ export const createShift = async (req, res) => {
     });
   }
 };
+
 export const getListShift = async (req, res) => {
   try {
-    const shift = await Shift.find({}).populate("timeBook.shift").exec();
+    const shift = await Shift.find().sort({ timeStart: 1 }).exec();
     return res.json(shift);
   } catch (error) {
     return res.status(400).json({
-      error : error.message,
-      message : 'Có lỗi xảy ra'
-    })
+      message: error.message,
+    });
+
+
   }
 };
