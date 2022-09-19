@@ -19,17 +19,7 @@ const employeeSchema = new Schema({
         },
     },
     timeWork:{
-        date:{
-            type:String
-        },
-        shift:{
-            type : ObjectId,
-            ref:"Shift",
-            required:true
-        },
-        status:{
-            default:0
-        }
+        type : Array,
     },
     status:{
         type:Number,

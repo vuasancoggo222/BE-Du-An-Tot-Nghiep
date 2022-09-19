@@ -6,7 +6,7 @@ export const update = async (req, res) => {
         res.json(employee)
     } catch (error) {
         res.status(400).json({
-            message: "Sua nhan vien khong thanh cong",
+            message: error.message
         })
     }
 }
