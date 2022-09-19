@@ -1,12 +1,12 @@
 import Employee from '../models/employee' 
 
-export const create = async (req, res) => {
+export const update = async (req, res) => {
     try {
-        const employee = await new Employee(req.body).save();
+        const employee = await Employee.findOneAndUpdate({id_: req.params.id}, req.body, {new: true}).exec();
         res.json(employee)
     } catch (error) {
         res.status(400).json({
-            message: "Them nhan vien khong thanh cong",
+            message: "Sua nhan vien khong thanh cong",
         })
     }
 }
