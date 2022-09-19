@@ -22,6 +22,18 @@ export const list = async(req, res) => {
         }
 
     }
+        //update service
+export const update = async(req, res) => {
+        try {
+            const UpdateService = await Service.findByIdAndUpdate(req.params.id, req.body)
+            res.json(UpdateService);
+        } catch (error) {
+            res.status(400).json({
+                message: "Không tìm được dich vu anh eiii"
+            })
+        }
+
+    }
 export const unactiveService = async (req,res) => {
     try {
         const services = await Service.find({status : 0}).exec()
