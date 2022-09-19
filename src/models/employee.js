@@ -20,7 +20,7 @@ const employeeSchema = new Schema({
     },
     timeWork:{
         date:{
-            type:Date
+            type:String
         },
         shift:{
             type : ObjectId,
