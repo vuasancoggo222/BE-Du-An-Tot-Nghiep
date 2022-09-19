@@ -34,6 +34,18 @@ export const update = async(req, res) => {
         }
 
     }
+    // delete service
+export const remove = async(req, res) => {
+    try {
+        const removeService = await Service.findByIdAndDelete(req.params.id)
+        res.json(removeService);
+    } catch (error) {
+        res.status(400).json({
+            message: "Không tìm được dich vu anh eiii"
+        })
+    }
+
+}
 export const unactiveService = async (req,res) => {
     try {
         const services = await Service.find({status : 0}).exec()
