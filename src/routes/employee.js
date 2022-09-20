@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {list,create} from "../controllers/employee";
+import {create,list} from "../controllers/employee";
 
 const router = Router();
 router.post("/employees", create);
