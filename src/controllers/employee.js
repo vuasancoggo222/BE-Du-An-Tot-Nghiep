@@ -6,7 +6,7 @@ export const list = async (req, res) => {
         res.json(employees)
     } catch (error) {
         res.status(400).json({
-            message: error.message,
+            message: error.message
         })
     }
 }
