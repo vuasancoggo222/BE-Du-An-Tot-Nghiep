@@ -2,7 +2,7 @@ import Employee from '../models/employee'
 
 export const list = async (req, res) => {
     try {
-        const employees = await Employee.find().exec();
+        const employees = await Employee.find({}).exec();
         res.json(employees)
     } catch (error) {
         res.status(400).json({
