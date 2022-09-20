@@ -1,9 +1,9 @@
 import Employee from '../models/employee' 
 
-export const create = async (req, res) => {
+export const list = async (req, res) => {
     try {
-        const employee = await new Employee(req.body).save();
-        res.json(employee)
+        const employees = await Employee.find({}).exec();
+        res.json(employees)
     } catch (error) {
         res.status(400).json({
             message: error.message
