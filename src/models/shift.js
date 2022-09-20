@@ -7,11 +7,11 @@ const shiftSchema = new Schema(
       required: true,
     },
     timeStart: {
-      type: Date,
+      type: String,
       required: true
     },
     timeEnd: {
-       type: Date,
+       type: String,
        required: true
        },
   },

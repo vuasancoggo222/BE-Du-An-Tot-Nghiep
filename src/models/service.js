@@ -7,9 +7,6 @@ const serviceSchema = new Schema({
         unique: true,
         trim : true
     },
-    time: {
-        type:Date,
-    },
     description: {
         type: String,
         required : true
