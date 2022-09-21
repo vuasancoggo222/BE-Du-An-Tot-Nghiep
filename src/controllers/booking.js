@@ -10,7 +10,7 @@ export const getEmployeeByDate = async (req, res) => {
       .select("-idCard")
       .populate('timeWork.shiftId')
       .exec();
-    
+
     res.json(existEmployee);
   } catch (error) {
     res.status(400).json({
