@@ -11,6 +11,10 @@ const userSchema = new Schema(
     description: {
       type: String,
     },
+    serviceId : {
+      type : ObjectId,
+      ref : "Service"
+    },
     phoneNumber: {
       type: String,
       unique: true,
