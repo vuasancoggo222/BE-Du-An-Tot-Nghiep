@@ -8,7 +8,9 @@ export const getEmployeeByDate = async (req, res) => {
       timeWork: { $elemMatch: { date: timeStamp } },
     })
       .select("-idCard")
+      .populate('timeWork.shiftId')
       .exec();
+    
     res.json(existEmployee);
   } catch (error) {
     res.status(400).json({
