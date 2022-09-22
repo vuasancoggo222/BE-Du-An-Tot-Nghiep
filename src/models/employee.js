@@ -2,6 +2,7 @@ import mongoose, {Schema} from "mongoose";
 
 const {ObjectId} = mongoose.Types;
 const employeeSchema = new Schema({
+    
     name:{
         type:String,
         require:true,

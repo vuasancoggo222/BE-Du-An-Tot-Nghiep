@@ -1,17 +1,20 @@
+import { Mongoose } from "mongoose";
 import Booking from "../models/booking";
 import Employee from "../models/employee";
 
 export const getEmployeeByDate = async (req, res) => {
   const timeStamp = Number(req.query.date);
+  const {employee} = req.query
   try {
     const existEmployee = await Employee.find({
-      timeWork: { $elemMatch: { date: timeStamp }},
+        "_id" :  employee ,
+      "timeWork": { $elemMatch: { date: timeStamp }},
     })
       .select("-idCard")
       .populate('timeWork.shiftId')
       .exec();
 
-    res.json(existEmployee);
+    return res.json(existEmployee);
   } catch (error) {
     res.status(400).json({
       message: error.message,
