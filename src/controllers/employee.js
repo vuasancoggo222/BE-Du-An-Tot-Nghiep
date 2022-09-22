@@ -52,7 +52,7 @@ export const addEmployeeShift = async (req, res) => {
   try {
     const existShift = await Employee.find({
       _id: employeeId,
-       timeWork :{ $elemMatch: {date} }
+       "timeWork" :{ $elemMatch: {date,shiftId} }
     }).exec();
     if (existShift.length) {
       return res.status(400).json({
