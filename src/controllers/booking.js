@@ -5,7 +5,7 @@ export const getEmployeeByDate = async (req, res) => {
   const timeStamp = Number(req.query.date);
   try {
     const existEmployee = await Employee.find({
-      timeWork: { $elemMatch: { date: timeStamp } },
+      timeWork: { $elemMatch: { date: timeStamp }},
     })
       .select("-idCard")
       .populate('timeWork.shiftId')
