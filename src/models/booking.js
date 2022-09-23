@@ -34,7 +34,6 @@ const userSchema = new Schema(
       type: ObjectId,
       ref: "Users",
     },
-    timeBook:  {
       date : {
         type : Number,
         required : true,
@@ -42,9 +41,7 @@ const userSchema = new Schema(
       shiftId :{
         type : ObjectId,
         ref : "Shift"
-      }
-    }
-     
+      } 
   },
   { timestamps: true }
 );

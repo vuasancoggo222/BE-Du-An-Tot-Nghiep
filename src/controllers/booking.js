@@ -22,10 +22,17 @@ export const getEmployeeByDate = async (req, res) => {
   }
 };
 export const createBooking = async (req, res) => {
-  const {timeBook} = req.body
-  console.log(timeBook);
   try {
-    const booking = await new Booking(req.body).save();
+   
+    const booking = await new Booking({
+      name : req.body.name,
+      phoneNumber : req.body.phoneNumber,
+      description : req.body.description,
+      serviceId : req.body.serviceId,
+      employeeId : req.query.employeeId,
+      date : Number(req.body.date),
+      shiftId: req.body.shiftId
+    }).save();
     return res.json(booking);
   } catch (error) {
     return res.status(400).json({
