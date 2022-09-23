@@ -11,3 +11,13 @@ export const createContact = async (req, res) => {
     }
   };
   
+  export const getListContact= async (req, res) => {
+    try {
+      const contact = await Contact.find().sort({ timeStart: 1 }).exec();
+      return res.json(contact);
+    } catch (error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
+  };
