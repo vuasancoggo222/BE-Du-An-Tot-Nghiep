@@ -76,6 +76,39 @@ export const addEmployeeShift = async (req, res) => {
   }
 };
 
+
+export const updateEmployeeShift = async (req, res) => {
+  const employeeId = req.params.id;
+  const newShift = req.body;
+  const date = Number(newShift.date);
+  const shiftId = req.body.shiftId;
+  try {
+    const existShift = await Employee.find({
+      _id: employeeId,
+       "timeWork" :{ $elemMatch: {date,shiftId} }
+    }).exec();
+    if (existShift.length) {
+      return res.status(400).json({
+        message: "Ca làm đã tồn tại",
+      });
+    } else {
+      const employee = await Employee.findOneAndUpdate(
+        { _id: employeeId },
+        { $push: { timeWork: newShift } },
+        { new: true }
+      ).exec();
+      return res.json({
+        success: "Success",
+        employee,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export const deleteEmployeeShift = async (req,res) => {
   const employeeId = req.params.id;
   const date = Number(req.query.date);

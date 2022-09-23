@@ -7,7 +7,7 @@ const serviceSchema = new Schema({
         unique: true,
         trim : true
     },
-    description: {
+    description: {  
         type: String,
         required : true
     },
