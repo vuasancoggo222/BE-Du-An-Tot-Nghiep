@@ -22,6 +22,8 @@ export const getEmployeeByDate = async (req, res) => {
   }
 };
 export const createBooking = async (req, res) => {
+  const {timeBook} = req.body
+  console.log(timeBook);
   try {
     const booking = await new Booking(req.body).save();
     return res.json(booking);
@@ -33,7 +35,7 @@ export const createBooking = async (req, res) => {
 };
 export const listBooking = async (req, res) => {
   try {
-    const booking = await Booking.find({}).populate("timeBook.shift").exec();
+    const booking = await Booking.find({}).populate("timeBook.shiftId").exec();
     return res.json(booking);
   } catch (error) {
     return res.status(400).json({

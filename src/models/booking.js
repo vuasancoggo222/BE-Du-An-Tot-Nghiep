@@ -22,6 +22,10 @@ const userSchema = new Schema(
         return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
       },
     },
+    employeeId : {
+      type : ObjectId,
+      ref : "Employee"
+    },
     status: {
       type: Number,
       default: 0,
@@ -30,19 +34,17 @@ const userSchema = new Schema(
       type: ObjectId,
       ref: "Users",
     },
-    timeBook: [
-      {
-        date : {
-          type : Number,
-          required : true,
-        },
-        shiftId :{
-          type : ObjectId,
-          required : true,
-          ref : "Shift"
-        }
+    timeBook:  {
+      date : {
+        type : Number,
+        required : true,
+      },
+      shiftId :{
+        type : ObjectId,
+        ref : "Shift"
       }
-    ]
+    }
+     
   },
   { timestamps: true }
 );
