@@ -20,12 +20,27 @@ export const create = async (req, res) => {
   }
 };
 export const update = async (req, res) => {
+  const condition = { _id: req.params.id }
+  let update = {
+    status: 0
+  };
   try {
-    const employee = await Employee.findOneAndUpdate(
-      { id_: req.params.id },
-      req.body,
-      { new: true }
-    ).exec();
+    const employeeOld = await Employee.findOne({ _id: req.params.id, }).exec();
+    if(employeeOld.status === 1) {
+      return
+    }else{
+      update = {
+        status: 1
+      }
+    }
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+
+  try {
+    const employee = await Employee.findOneAndUpdate(condition, update).exec();
     res.json(employee);
   } catch (error) {
     res.status(400).json({
@@ -35,7 +50,7 @@ export const update = async (req, res) => {
 };
 export const read = async (req, res) => {
   try {
-    const employee = await Employee.findOne({ id_: req.params.id }).exec();
+    const employee = await Employee.findOne({ _id: req.params.id }).exec();
     res.json(employee);
   } catch (error) {
     res.status(400).json({
@@ -52,7 +67,7 @@ export const addEmployeeShift = async (req, res) => {
   try {
     const existShift = await Employee.find({
       _id: employeeId,
-       "timeWork" :{ $elemMatch: {date,shiftId} }
+      "timeWork": { $elemMatch: { date, shiftId } }
     }).exec();
     if (existShift.length) {
       return res.status(400).json({
@@ -76,20 +91,20 @@ export const addEmployeeShift = async (req, res) => {
   }
 };
 
-export const deleteEmployeeShift = async (req,res) => {
+export const deleteEmployeeShift = async (req, res) => {
   const employeeId = req.params.id;
   const date = Number(req.query.date);
   const shiftId = req.query.shift;
   try {
     const existShift = await Employee.find({
       _id: employeeId,
-       "timeWork" :{ $elemMatch: {date,shiftId} }
+      "timeWork": { $elemMatch: { date, shiftId } }
     }).exec();
     if (existShift.length) {
       const employee = await Employee.findOneAndUpdate(
         { _id: employeeId },
-        { $pull: { "timeWork": {shiftId,date} } },
-        { new: true,safe: true }
+        { $pull: { "timeWork": { shiftId, date } } },
+        { new: true, safe: true }
       ).exec();
       return res.json({
         success: "Success",

@@ -18,11 +18,11 @@ app.use("/api", serviceRouter);
 app.use("/api", bookingRouter);
 app.use("/api", shiftRouter);
 app.use("/api", employeeRouter);
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running`);
+mongoose.connect("mongodb://localhost:27017/asm")
+    .then(() => console.log("Ket noi DB thanh cong"))
+    .catch(error => console.log(error))
+// connect
+const PORT = 8000;
+app.listen(PORT, () => {
+    console.log("Server của bạn đang chạy cổng ", PORT);
 });
-
-mongoose
-  .connect(process.env.MONGODB_URL)
-  .then(() => console.log("Connect DB Successfully"))
-  .catch((error) => console.log(error));
