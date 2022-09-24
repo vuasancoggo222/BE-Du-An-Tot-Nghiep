@@ -8,13 +8,6 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
-    description: {
-      type: String,
-    },
-    serviceId : {
-      type : ObjectId,
-      ref : "Service"
-    },
     phoneNumber: {
       type: String,
       unique: true,
@@ -22,27 +15,34 @@ const userSchema = new Schema(
         return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
       },
     },
+    note: {
+      type: String,
+    },
     status: {
       type: Number,
       default: 0,
     },
-    userId: {
-      type: ObjectId,
-      ref: "Users",
+    date : {
+      type : Number,
+      required : true,
     },
-    timeBook: [
-      {
-        date : {
-          type : Number,
-          required : true,
-        },
-        shiftId :{
-          type : ObjectId,
-          required : true,
-          ref : "Shift"
-        }
-      }
-    ]
+    shiftId :{
+      type : ObjectId,
+      required : true,
+      ref : "Shift"
+    },
+    userId : {
+      type : ObjectId,
+      ref : "Users"
+    },
+    employeeId : {
+      type : ObjectId,
+      ref : "Employee"
+    },
+    serviceId : {
+      type : ObjectId,
+      ref : "Service"
+    },   
   },
   { timestamps: true }
 );

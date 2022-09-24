@@ -1,4 +1,6 @@
 import Employee from "../models/employee";
+import moment from "moment/moment";
+import { mongoose } from "mongoose";
 export const list = async (req, res) => {
   try {
     const employees = await Employee.find({}).exec();
@@ -107,3 +109,75 @@ export const deleteEmployeeShift = async (req,res) => {
     });
   }
 }
+export const getEmployeeByDate = async (req, res) => {
+  const timeStamp = Number(req.query.date);
+  const employeeId = req.query.employee
+  const currentTimeStamp = moment().startOf('day').unix()
+  try {
+   if(timeStamp && employeeId){
+    const existEmployee = await Employee.aggregate([
+      { $match : { _id : mongoose.Types.ObjectId(employeeId) }},
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $eq: ["$$data.date", timeStamp],
+              }
+            }
+          }
+        }
+      }
+    ])
+    return res.json(existEmployee)
+   }
+   else if(timeStamp && !employeeId){
+    const existEmployee = await Employee.aggregate([
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $eq: ["$$data.date", timeStamp],
+              }
+            }
+          }
+        }
+      }
+    ])
+    return res.json(existEmployee)
+   }
+   else if(!timeStamp && employeeId){
+    const existEmployee = await Employee.aggregate([
+      { $match : { _id : mongoose.Types.ObjectId(employeeId) }},
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $gte : ["$$data.date",currentTimeStamp]
+              }
+            }
+          }
+        }
+      }
+    ])
+    return res.json(existEmployee)
+   }
+   else{
+    return res.status(400).json({
+      message : 'Vui lòng chọn thời gian hoặc nhân viên.'
+    })
+   }
+  } catch (error) {
+    return res.status(400).json({
+      message : error.message
+    })
+  }
+};

@@ -1,5 +1,4 @@
 import mongoose, {Schema} from "mongoose";
-
 const {ObjectId} = mongoose.Types;
 const employeeSchema = new Schema({
     
@@ -8,10 +7,12 @@ const employeeSchema = new Schema({
         require:true,
     },
     idCard:{
-        type:String
+        type:String,
+        unique : true
     },
     email:{
         type:String,
+        unique : true
     },
     phoneNumber:{
         type:String,
