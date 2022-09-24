@@ -1,6 +1,5 @@
-import { Mongoose } from "mongoose";
+import { mongoose } from "mongoose";
 import Booking from "../models/booking";
-
 export const createBooking = async (req, res) => {
   try {
    
