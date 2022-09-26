@@ -1,4 +1,5 @@
 import Employee from "../models/employee";
+import Shift from '../models/shift'
 import moment from "moment/moment";
 import { mongoose } from "mongoose";
 export const list = async (req, res) => {
@@ -131,6 +132,7 @@ export const getEmployeeByDate = async (req, res) => {
         }
       }
     ])
+    await Shift.populate(existEmployee,{path : "timeWork.shiftId"})
     return res.json(existEmployee)
    }
    else if(timeStamp && !employeeId){
