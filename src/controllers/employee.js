@@ -183,3 +183,17 @@ export const getEmployeeByDate = async (req, res) => {
     })
   }
 };
+
+export const deleteEmployee = async (req,res) =>{
+  try {
+    const employee = await Employee.findOneAndDelete({ _id: req.params.id },{new: true}).exec()
+    res.json({
+      message : 'Success',
+      employee
+    })
+  } catch (error) {
+    res.status(400).json({
+      message : error.message
+    })
+  }
+}
