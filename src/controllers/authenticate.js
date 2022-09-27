@@ -1,6 +1,7 @@
 import Users from "../models/user";
 import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {
   const { phoneNumber } = req.body;
   try {
@@ -24,3 +25,47 @@ export const signup = async (req, res) => {
     });
   }
 };
+
+export const signin = async (req,res) => {
+  const {email,password,phoneNumber} = req.body
+  try {
+    const user = await Users.findOne({phoneNumber} || {email}).exec()
+  if(!user){
+    return res.status(400).json({
+      message : "Email hoặc số điện thoại không hợp lệ."
+    })
+  }
+  if(user.status == 0){
+    return res.status(400).json({
+      message : "Tài khoản bạn chưa xác thực"
+    })
+  }
+  else if(user.status == 2){
+    return res.status(400).json({
+      message : "Tài khoản bạn bị khoá"
+    })
+  }
+  else if(user.status == 1){
+    const token = jwt.sign({_id: user._id},"datn",{expiresIn : "24h"})
+    const match = await bcrypt.compare(password,user.password)
+    if(match){
+      return res.json({
+        message : 'Login Success',
+        id : user._id,
+        phoneNumber : user.phoneNumber,
+        name : user.name,
+        token
+      })
+    }
+    else{
+      return res.status(400).json({
+        message : "Số điện thoại / Email hoặc mật khẩu không đúng"
+      })
+    }
+  }
+  } catch (error) {
+    return res.status(400).json({
+      message : error.message
+    })
+  }
+}
