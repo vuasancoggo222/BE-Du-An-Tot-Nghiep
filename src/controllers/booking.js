@@ -26,7 +26,7 @@ export const listBooking = async (req, res) => {
     .populate({path: 'userId',select : '-password'})
     .populate("serviceId")
     .populate({path : 'employeeId',select : '-idCard'})
-    .populate({path: 'shiftId',select: "shiftName"})
+    .populate({path: 'shiftId',select: ['shiftName','timeStart','timeEnd']})
     .exec();
     return res.json(booking);
   } catch (error) {
