@@ -38,10 +38,15 @@ export const update = async (req, res) => {
 };
 
 export const updateStatusTimeWork = async (req, res) => {
+  const employeeId = req.param.id
+  const shiftId = req.query.shift
+  const date = req.query.date
+  const {status} = req.body
+  console.log(typeof options);
   try {
     const employee = await Employee.findOneAndUpdate(
-      { id_: req.params.id },
-      req.body,
+      { id_: req.params.id, "timeWork" : {$elemMatch : {date,shiftId} } },
+      { $set: { "timeWork.$.status": status } },{new:true}
     ).exec();
     res.json(employee);
   } catch (error) {
