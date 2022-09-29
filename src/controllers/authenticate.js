@@ -27,12 +27,12 @@ export const signup = async (req, res) => {
 };
 
 export const signin = async (req,res) => {
-  const {email,password,phoneNumber} = req.body
+  const {password,phoneNumber} = req.body
   try {
-    const user = await Users.findOne({phoneNumber} || {email}).exec()
+    const user = await Users.findOne({phoneNumber}).exec()
   if(!user){
     return res.status(400).json({
-      message : "Email hoặc số điện thoại không hợp lệ."
+      message : "Số điện thoại không hợp lệ."
     })
   }
   if(user.status == 0){
