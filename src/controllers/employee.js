@@ -25,7 +25,7 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const employee = await Employee.findOneAndUpdate(
-      { id_: req.params.id },
+      { _id: req.params.id },
       req.body,
       { new: true }
     ).exec();
