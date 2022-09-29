@@ -32,7 +32,7 @@ const employeeSchema = new Schema({
             },
             status : {
                 type : Number,
-                default : 1
+                default : 0
             }
         }
     ],

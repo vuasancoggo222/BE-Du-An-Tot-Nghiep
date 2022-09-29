@@ -36,6 +36,20 @@ export const update = async (req, res) => {
     });
   }
 };
+
+export const updateStatusTimeWork = async (req, res) => {
+  try {
+    const employee = await Employee.findOneAndUpdate(
+      { id_: req.params.id },
+      req.body,
+    ).exec();
+    res.json(employee);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
 export const read = async (req, res) => {
   try {
     const employee = await Employee.findOne({ _id: req.params.id }).exec();
@@ -88,7 +102,7 @@ export const deleteEmployeeShift = async (req,res) => {
       _id: employeeId,
        "timeWork" :{ $elemMatch: {date,shiftId} }
     }).exec();
-    if (existShift.length) {
+    if (existShift.length) { 
       const employee = await Employee.findOneAndUpdate(
         { _id: employeeId },
         { $pull: { "timeWork": {shiftId,date} } },

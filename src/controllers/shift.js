@@ -29,6 +29,17 @@ export const getListShift = async (req, res) => {
   }
 };
 
+export const read = async (req, res) => {
+  try {
+    const shift = await Shift.findOne({ _id: req.params.id }).exec();
+    res.json(shift);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export const deleteShift = async (req, res) => {
   try {
     const shift = await Shift.findByIdAndDelete({ _id: req.params.id }).exec();
