@@ -31,7 +31,7 @@ const userSchema = new Schema(
     },
     shiftId: {
       type: ObjectId,
-      required: [true, "Vui lòng chọn ca đến spa."],
+
       ref: "Shift",
     },
     userId: {
@@ -41,7 +41,6 @@ const userSchema = new Schema(
     employeeId: {
       type: ObjectId,
       ref: "Employee",
-      required: true,
     },
     serviceId: {
       type: ObjectId,
