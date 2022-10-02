@@ -8,6 +8,9 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
+    age : {
+      type : Number
+    },
     phoneNumber: {
       type: String,
       unique: true,
@@ -28,16 +31,17 @@ const userSchema = new Schema(
     },
     shiftId :{
       type : ObjectId,
-      required : true,
-      ref : "Shift"
+      required : [true,'Vui lòng chọn ca đến spa.'],
+      ref : "Shift",
     },
     userId : {
       type : ObjectId,
-      ref : "Users"
+      ref : "Users",
     },
     employeeId : {
       type : ObjectId,
-      ref : "Employee"
+      ref : "Employee",
+      required : true
     },
     serviceId : {
       type : ObjectId,
