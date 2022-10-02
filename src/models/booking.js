@@ -8,12 +8,12 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
-    age : {
-      type : Number
+    age: {
+      type: Number,
     },
     phoneNumber: {
       type: String,
-      unique: true,
+
       validate: (value) => {
         return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
       },
@@ -25,28 +25,27 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
-    date : {
-      type : Number,
-      required : true,
+    date: {
+      type: Number,
+      required: true,
     },
-    shiftId :{
-      type : ObjectId,
-      required : [true,'Vui lòng chọn ca đến spa.'],
-      ref : "Shift",
+    shiftId: {
+      type: ObjectId,
+
+      ref: "Shift",
     },
-    userId : {
-      type : ObjectId,
-      ref : "Users",
+    userId: {
+      type: ObjectId,
+      ref: "Users",
     },
-    employeeId : {
-      type : ObjectId,
-      ref : "Employee",
-      required : true
+    employeeId: {
+      type: ObjectId,
+      ref: "Employee",
     },
-    serviceId : {
-      type : ObjectId,
-      ref : "Service"
-    },   
+    serviceId: {
+      type: ObjectId,
+      ref: "Service",
+    },
   },
   { timestamps: true }
 );
