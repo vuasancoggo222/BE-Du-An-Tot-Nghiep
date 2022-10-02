@@ -7,6 +7,7 @@ import serviceRouter from "./routes/service";
 import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import shiftRouter from "./routes/shift";
+import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/api", authRouter);
 app.use("/api", serviceRouter);
 app.use("/api", bookingRouter);
 app.use("/api", shiftRouter);
+app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.listen(process.env.PORT, () => {
   console.log(`Server is running`);

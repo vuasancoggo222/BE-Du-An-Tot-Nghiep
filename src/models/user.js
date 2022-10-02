@@ -24,12 +24,13 @@ password: {
 },
 role : {
     type : Number,
-    default : 2,
+    default : 0,
 },
 status : {
     type : Number,
     default : 0    
 },
+
 },{timestamps:true})
 
 userSchema.pre('save',async function(next){

@@ -1,4 +1,7 @@
 import Employee from "../models/employee";
+import Shift from '../models/shift'
+import moment from "moment/moment";
+import { mongoose } from "mongoose";
 export const list = async (req, res) => {
   try {
     const employees = await Employee.find({}).exec();
@@ -22,7 +25,7 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const employee = await Employee.findOneAndUpdate(
-      { id_: req.params.id },
+      { _id: req.params.id },
       req.body,
       { new: true }
     ).exec();
@@ -33,9 +36,28 @@ export const update = async (req, res) => {
     });
   }
 };
+
+export const updateStatusTimeWork = async (req, res) => {
+  const employeeId = req.param.id
+  const shiftId = req.query.shift
+  const date = req.query.date
+  const {status} = req.body
+  console.log(typeof options);
+  try {
+    const employee = await Employee.findOneAndUpdate(
+      { id_: req.params.id, "timeWork" : {$elemMatch : {date,shiftId} } },
+      { $set: { "timeWork.$.status": status } },{new:true}
+    ).exec();
+    res.json(employee);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
 export const read = async (req, res) => {
   try {
-    const employee = await Employee.findOne({ id_: req.params.id }).exec();
+    const employee = await Employee.findOne({ _id: req.params.id }).exec();
     res.json(employee);
   } catch (error) {
     res.status(400).json({
@@ -85,7 +107,7 @@ export const deleteEmployeeShift = async (req,res) => {
       _id: employeeId,
        "timeWork" :{ $elemMatch: {date,shiftId} }
     }).exec();
-    if (existShift.length) {
+    if (existShift.length) { 
       const employee = await Employee.findOneAndUpdate(
         { _id: employeeId },
         { $pull: { "timeWork": {shiftId,date} } },
@@ -105,5 +127,92 @@ export const deleteEmployeeShift = async (req,res) => {
     res.status(400).json({
       message: error.message,
     });
+  }
+}
+export const getEmployeeByDate = async (req, res) => {
+  const timeStamp = Number(req.query.date);
+  const employeeId = req.query.employee
+  const currentTimeStamp = moment().startOf('day').unix()
+  try {
+   if(timeStamp && employeeId){
+    const existEmployee = await Employee.aggregate([
+      { $match : { _id : mongoose.Types.ObjectId(employeeId) }},
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $eq: ["$$data.date", timeStamp],
+              }
+            }
+          }
+        }
+      }
+    ])
+    await Shift.populate(existEmployee,{path : "timeWork.shiftId"})
+    return res.json(existEmployee)
+   }
+   else if(timeStamp && !employeeId){
+    const existEmployee = await Employee.aggregate([
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $eq: ["$$data.date", timeStamp],
+              }
+            }
+          }
+        }
+      }
+    ])
+    return res.json(existEmployee)
+   }
+   else if(!timeStamp && employeeId){
+    const existEmployee = await Employee.aggregate([
+      { $match : { _id : mongoose.Types.ObjectId(employeeId) }},
+      {
+        $project : {
+          "timeWork" : {
+            $filter : {
+              input: "$timeWork",
+              as: "data",
+              cond: {
+                  $gte : ["$$data.date",currentTimeStamp]
+              }
+            }
+          }
+        }
+      }
+    ])
+    return res.json(existEmployee)
+   }
+   else{
+    return res.status(400).json({
+      message : 'Vui lòng chọn thời gian hoặc nhân viên.'
+    })
+   }
+  } catch (error) {
+    return res.status(400).json({
+      message : error.message
+    })
+  }
+};
+
+export const deleteEmployee = async (req,res) =>{
+  try {
+    const employee = await Employee.findOneAndDelete({ _id: req.params.id },{new: true}).exec()
+    res.json({
+      message : 'Success',
+      employee
+    })
+  } catch (error) {
+    res.status(400).json({
+      message : error.message
+    })
   }
 }
