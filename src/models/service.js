@@ -19,6 +19,9 @@ const serviceSchema = new Schema({
         type: Number,
         default:1
     },
+    serviceType : {
+        type : String,
+    },
     image: {
         type: String,
         required : true

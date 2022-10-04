@@ -9,8 +9,8 @@ export const createBooking = async (req, res) => {
       note: req.body.note,
       serviceId: req.body.serviceId,
       employeeId: req.body.employeeId,
-      date: Number(req.body.date),
-      shiftId: req.body.shiftId,
+      date: req.body.date,
+      time: req.body.time
     }).save();
     return res.json(booking);
   } catch (error) {
@@ -25,10 +25,6 @@ export const listBooking = async (req, res) => {
       .populate({ path: "userId", select: "-password" })
       .populate("serviceId")
       .populate({ path: "employeeId", select: "-idCard" })
-      .populate({
-        path: "shiftId",
-        select: ["shiftName", "timeStart", "timeEnd"],
-      })
       .exec();
     return res.json(booking);
   } catch (error) {

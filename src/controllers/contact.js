@@ -21,3 +21,17 @@ export const createContact = async (req, res) => {
       });
     }
   };
+
+  export const deleteContact = async (req,res) =>{
+    try {
+      const contact = await Contact.findOneAndDelete({_id : req.params.id}).exec()
+      res.json({
+        message : 'Success',
+        contact
+      })
+    } catch (error) {
+      res.status(400).json({
+        message : error.message
+      })
+    }
+  }

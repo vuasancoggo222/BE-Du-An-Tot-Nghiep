@@ -54,7 +54,8 @@ export const signin = async (req,res) => {
         id : user._id,
         phoneNumber : user.phoneNumber,
         name : user.name,
-        token
+        token,
+        role : user.role
       })
     }
     else{

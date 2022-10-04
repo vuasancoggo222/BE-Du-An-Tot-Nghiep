@@ -1,7 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 const {ObjectId} = mongoose.Types;
 const employeeSchema = new Schema({
-    
     name:{
         type:String,
         require:true,
@@ -20,22 +19,9 @@ const employeeSchema = new Schema({
             return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
         },
     },
-    timeWork:[
-        {
-            date : {
-                type : Number,
-                required : true
-            },
-            shiftId :{
-                type : ObjectId,
-                ref : "Shift"
-            },
-            status : {
-                type : Number,
-                default : 0
-            }
-        }
-    ],
+    booking : {
+        type : Array
+    },
     status:{
         type:Number,
         default:1
