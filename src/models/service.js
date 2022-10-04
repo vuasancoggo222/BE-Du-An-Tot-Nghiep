@@ -18,6 +18,10 @@ const serviceSchema = new Schema({
     status: {
         type: Number,
         default:1
+    },
+    image: {
+        type: String,
+        required : true
     }
 }, { timestamps: true })
 export default mongoose.model('Service', serviceSchema);
