@@ -13,7 +13,6 @@ const userSchema = new Schema(
     },
     phoneNumber: {
       type: String,
-
       validate: (value) => {
         return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
       },
@@ -26,13 +25,11 @@ const userSchema = new Schema(
       default: 0,
     },
     date: {
-      type: Number,
+      type: Date,
       required: true,
     },
-    shiftId: {
-      type: ObjectId,
-
-      ref: "Shift",
+    time : {
+      type : String,
     },
     userId: {
       type: ObjectId,
@@ -42,10 +39,12 @@ const userSchema = new Schema(
       type: ObjectId,
       ref: "Employee",
     },
-    serviceId: {
-      type: ObjectId,
-      ref: "Service",
-    },
+    serviceId: [
+      {
+        type : ObjectId,
+        ref : "Service"
+      }
+    ]
   },
   { timestamps: true }
 );
