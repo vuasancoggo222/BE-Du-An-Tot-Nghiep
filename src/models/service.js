@@ -21,6 +21,10 @@ const serviceSchema = new Schema({
     },
     serviceType : {
         type : String,
+    },
+    image: {
+        type: String,
+        required : true
     }
 }, { timestamps: true })
 export default mongoose.model('Service', serviceSchema);
