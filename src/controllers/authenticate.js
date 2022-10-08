@@ -72,9 +72,10 @@ export const signin = async (req,res) => {
 }
 export const changeStatusAccount = async (req,res) => {
   const {status} = req.query
-  const phoneNumber = req.query.phone
+  const phone = req.query.phone
+  const phoneNumber = `+${phone}`
   try {
-    const user = await Users.findOneAndUpdate({phoneNumber},{status : status},{new : true}).exec()
+    const user = await Users.findOneAndUpdate({phoneNumber},{status : status},{new : true}).select('-password').exec()
     return res.json({
       message : "Success",
       user
