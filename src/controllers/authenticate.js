@@ -3,10 +3,10 @@ import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {
-  const  phoneContact = req.body.phoneNumber;
-  const phoneNumber = `+${phoneContact}`
+  const phoneContact = req.body.phoneNumber;
+  req.body.phoneNumber = `+${phoneContact}`
   try {
-    const existUser = await Users.findOne({ phoneNumber }).exec();
+    const existUser = await Users.findOne({ phoneNumber : req.body.phoneNumber }).exec();
     if (existUser) {
       return res.status(400).json({
         message: "Tài khoản đã tồn tại",

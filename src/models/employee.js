@@ -19,9 +19,6 @@ const employeeSchema = new Schema({
             return /(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(value);
         },
     },
-    booking : {
-        type : Array
-    },
     status:{
         type:Number,
         default:1
