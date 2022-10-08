@@ -3,7 +3,8 @@ import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {
-  const { phoneNumber } = req.body;
+  const  phoneContact = req.body.phoneNumber;
+  const phoneNumber = `+${phoneContact}`
   try {
     const existUser = await Users.findOne({ phoneNumber }).exec();
     if (existUser) {
