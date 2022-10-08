@@ -8,8 +8,13 @@ import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
+import { initializeApp } from 'firebase-admin/app';
 const app = express();
-
+import admin from 'firebase-admin'
+import serviceAccount from '../serviceAccountKey.json'
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
