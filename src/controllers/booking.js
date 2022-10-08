@@ -69,3 +69,14 @@ export const userBookingList = async (req,res) =>{
     })
   }
 }
+
+export const employeeBookingList = async (req,res) =>{
+  try {
+    const listBooking = await Booking.find({employeeId : req.params.id}).exec()
+    return res.json(listBooking)
+  } catch (error) {
+    return res.status(400).json({
+      message : error.message
+    })
+  }
+}
