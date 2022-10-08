@@ -8,13 +8,13 @@ import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
-import { authLimiter } from "./utils/limitRequest";
+// import { authLimiter } from "./utils/limitRequest";
 const app = express();
 
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
-app.use("/api",authLimiter,authRouter);
+app.use("/api",authRouter);
 app.use("/api", serviceRouter);
 app.use("/api", bookingRouter);
 app.use("/api", contactRouter);

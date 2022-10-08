@@ -1,5 +1,4 @@
 import Users from "../models/user";
-import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {
@@ -72,13 +71,24 @@ export const signin = async (req,res) => {
 }
 export const changeStatusAccount = async (req,res) => {
   const {status} = req.query
-  const phoneNumber = req.query.phone
+  const phone = req.query.phone
+  const phoneNumber = `+${phone}`
+  console.log(phoneNumber);
   try {
-    const user = await Users.findOneAndUpdate({phoneNumber},{status : status},{new : true}).exec()
-    return res.json({
-      message : "Success",
-      user
-    })
+    if(!phoneNumber){
+      return res.status(400).json({
+        message : "Số điện thoai không tồn tại"
+      })
+    }
+    else{
+      const user = await Users.findOneAndUpdate({phoneNumber:phoneNumber},{status : status},{new : true}).exec()
+      console.log(user);
+      return res.json({
+        message : "Success",
+        user
+      })
+    }
+ 
   } catch (error) {
     return res.status(400).json({
       message : error.message
