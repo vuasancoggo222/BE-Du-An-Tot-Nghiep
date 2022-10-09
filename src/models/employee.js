@@ -3,7 +3,7 @@ const {ObjectId} = mongoose.Types;
 const employeeSchema = new Schema({
     name:{
         type:String,
-        require:true,
+        required:true,
     },
     idCard:{
         type:String,

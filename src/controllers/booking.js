@@ -61,7 +61,7 @@ export const updateStatus = async (req, res) => {
 
 export const userBookingList = async (req,res) =>{
   try {
-    const listBooking = await Booking.find({userId : req.params.id}).exec()
+    const listBooking = await Booking.find({userId : req.params.id}).populate('serviceId').exec()
     return res.json(listBooking)
   } catch (error) {
     return res.status(400).json({
