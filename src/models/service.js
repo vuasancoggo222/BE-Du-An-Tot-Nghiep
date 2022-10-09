@@ -1,30 +1,40 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
-const serviceSchema = new Schema({
+const serviceSchema = new Schema(
+  {
     name: {
-        type: String,
-        unique: true,
-        trim : true
+      type: String,
+      unique: true,
+      trim: true,
     },
+
     description: {
-        type: String,
-        required : true
+      type: String,
+      required: true,
     },
     price: {
-        type: Number,
-        required : true
+      type: Number,
+      required: true,
     },
     status: {
-        type: Number,
-        default:1
+      type: Number,
+      default: 1,
     },
-    serviceType : {
-        type : String,
+    serviceType: {
+      type: String,
     },
     image: {
-        type: String,
-        required : true
-    }
-}, { timestamps: true })
-export default mongoose.model('Service', serviceSchema);
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      index: true,
+    },
+  },
+  { timestamps: true }
+);
+export default mongoose.model("Service", serviceSchema);
