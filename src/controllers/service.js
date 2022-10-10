@@ -57,6 +57,17 @@ export const remove = async (req, res) => {
 // readID service
 export const read = async (req, res) => {
   try {
+    const serviceId = await Service.findById(req.params.id);
+    console.log(req.params.id);
+    res.json(serviceId);
+  } catch (error) {
+    res.status(400).json({
+      message: "Không tìm được dich vu anh eiii",
+    });
+  }
+};
+export const readslug = async (req, res) => {
+  try {
     const serviceId = await Service.findOne({ slug: req.params.slug });
     console.log(req.params.id);
     res.json(serviceId);

@@ -6,6 +6,7 @@ import {
   remove,
   unactiveService,
   update,
+  readslug,
 } from "../controllers/service";
 
 const router = Router();
@@ -13,5 +14,6 @@ router.get("/service", list);
 router.post("/service", createService);
 router.patch("/service/:id", update);
 router.delete("/service/:id", remove);
-router.get("/service/:slug", read);
+router.get("/service-slug/:slug", readslug);
+router.get("/service/:id", read);
 export default router;
