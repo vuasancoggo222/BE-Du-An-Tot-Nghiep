@@ -9,6 +9,7 @@ import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
 import { initializeApp } from 'firebase-admin/app';
+import userRouter from './routes/user'
 const app = express();
 import admin from 'firebase-admin'
 import serviceAccount from '../serviceAccountKey.json'
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use("/api",authRouter);
 app.use("/api", serviceRouter);
 app.use("/api", bookingRouter);
+app.use("/api",userRouter)
 app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.listen(process.env.PORT, () => {
