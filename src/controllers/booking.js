@@ -1,11 +1,12 @@
 import { mongoose } from "mongoose";
 import Booking from "../models/booking";
 export const createBooking = async (req, res) => {
+  const phoneNumber = `+${req.body.prefix}${req.body.phoneNumber}`
   try {
     const booking = await new Booking({
       name: req.body.name,
       userId: req.query.user,
-      phoneNumber: req.body.phoneNumber,
+      phoneNumber: phoneNumber,
       note: req.body.note,
       serviceId: req.body.serviceId,
       employeeId: req.body.employeeId,
