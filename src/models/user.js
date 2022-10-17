@@ -14,6 +14,15 @@ phoneNumber:{
 avatar : {
     type : String,
 },
+address : {
+    type :String
+},
+age : {
+    type : Number
+},
+gender : {
+    type : Number
+},
 password: {
     type: String,
     required: true,
