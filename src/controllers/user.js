@@ -10,3 +10,19 @@ export const listUser = async(req,res) => {
     }
 }
 
+export const updateProfile = async (req,res) => {
+    const updateData = {
+        name : req.body.name,
+        avatar : req.body.avatar,
+        address : req.body.address,
+        age : req.body.age,
+        gender : req.body.gender
+    }
+try {
+    const updateProfile = await User.findByIdAndUpdate({_id : req.user._id},updateData,{new:true}).select('-password').exec()
+    return res.json(updateProfile)
+} catch (error) {
+    return res.status(400).json(error.message)
+}
+}
+
