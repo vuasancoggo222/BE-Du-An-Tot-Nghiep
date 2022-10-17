@@ -23,9 +23,11 @@ export const createBooking = async (req, res) => {
 export const listBooking = async (req, res) => {
   try {
     const booking = await Booking.find({})
+      .sort({createdAt : -1})
       .populate({ path: "userId", select: "-password" })
       .populate("serviceId")
       .populate({ path: "employeeId", select: "-idCard" })
+      
       .exec();
     return res.json(booking);
   } catch (error) {
