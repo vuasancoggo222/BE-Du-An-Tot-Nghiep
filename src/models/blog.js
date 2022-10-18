@@ -1,0 +1,33 @@
+import mongoose, { Schema } from "mongoose";
+const { ObjectId } = mongoose.Types;
+
+const blogSchema = new Schema({
+    title : {
+        type : String,
+        required : true,
+        minLength : 16
+    },
+    content : {
+        type : String,
+        required : true,
+        minLength : 100,
+    },
+    user : {
+        type : ObjectId,
+        ref : 'User'
+    },
+    slug: {
+        type: String,
+        lowercase: true,
+        unique: true,
+        index: true,
+      },
+    comments:[
+        {
+            type : ObjectId,
+            ref : "Comment"
+        }
+    ]
+},{timestamps:true})
+
+export default mongoose.model('Blog',blogSchema)
