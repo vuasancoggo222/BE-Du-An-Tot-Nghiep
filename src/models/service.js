@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
+const { ObjectId } = mongoose.Types;
 
 const serviceSchema = new Schema(
   {
@@ -36,6 +37,12 @@ const serviceSchema = new Schema(
       unique: true,
       index: true,
     },
+    feedback : [
+      {
+        type : ObjectId,
+        ref : 'Feedback'
+      }
+    ]
   },
   { timestamps: true }
 );
