@@ -1,5 +1,6 @@
 import { mongoose } from "mongoose";
 import Booking from "../models/booking";
+import User from '../models/user'
 export const createBooking = async (req, res) => {
   const phoneNumber = `+${req.body.prefix}${req.body.phoneNumber}`
   try {
@@ -50,11 +51,17 @@ export const read = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
-    const booking = await Booking.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body
-    ).exec();
-    res.json(booking);
+    if(req.body.status == 3){
+      const booking = await Booking.findOneAndUpdate(
+        { _id: req.params.id },req.body).exec();
+        await User.findOneAndUpdate({_id : booking.userId},{$push : {serviceUsed : booking.serviceId}})
+        return res.json(booking);
+    }
+    else{
+      const booking = await Booking.findOneAndUpdate(
+        { _id: req.params.id },req.body).exec();
+      return res.json(booking);
+    }
   } catch (error) {
     res.status(400).json({
       message: error.message,

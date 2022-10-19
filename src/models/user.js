@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
+const {ObjectId} = mongoose.Types;
 const userSchema = new Schema({
 name : {
     type : String,
@@ -39,7 +40,12 @@ status : {
     type : Number,
     default : 0    
 },
-
+serviceUsed : [
+    {
+      type : ObjectId,
+      ref : 'Service'
+    }
+  ]
 },{timestamps:true})
 
 userSchema.pre('save',async function(next){

@@ -36,13 +36,7 @@ const serviceSchema = new Schema(
       lowercase: true,
       unique: true,
       index: true,
-    },
-    feedback : [
-      {
-        type : ObjectId,
-        ref : 'Feedback'
-      }
-    ]
+    }
   },
   { timestamps: true }
 );
