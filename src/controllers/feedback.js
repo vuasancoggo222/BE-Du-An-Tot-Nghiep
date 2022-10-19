@@ -12,3 +12,12 @@ export const serviceFeedback = async(req,res) => {
      });
    }
 }
+
+export const listFeedBackByService = async (req,res) => {
+    try {
+        const listFeedback = await Feedback.find({service : req.params.svid}).exec()
+        res.json(listFeedback)
+    } catch (error) {
+        res.json(error.message)
+    }
+}
