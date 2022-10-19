@@ -10,6 +10,7 @@ import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
 import { initializeApp } from 'firebase-admin/app';
 import userRouter from './routes/user'
+import feedbackRouter from './routes/feedback'
 const app = express();
 import admin from 'firebase-admin'
 import serviceAccount from '../serviceAccountKey.json'
@@ -25,6 +26,7 @@ app.use("/api", bookingRouter);
 app.use("/api",userRouter)
 app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
+app.use("/api", feedbackRouter);
 app.listen(process.env.PORT, () => {
   console.log(`Server is running`);
 });
