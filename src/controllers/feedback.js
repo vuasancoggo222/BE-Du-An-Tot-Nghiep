@@ -15,7 +15,7 @@ export const serviceFeedback = async(req,res) => {
 
 export const listFeedBackByService = async (req,res) => {
     try {
-        const listFeedback = await Feedback.find({service : req.params.svid}).exec()
+        const listFeedback = await Feedback.find({service : req.params.svid}).populate({ path: 'user', select: ['name','_id','avatar'] }).exec()
         res.json(listFeedback)
     } catch (error) {
         res.json(error.message)
