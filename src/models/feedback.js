@@ -9,7 +9,7 @@ const feedbackSchema = new Schema({
     },
     user : {
         type : ObjectId,
-        ref : 'User'
+        ref : 'Users'
     },
     service : {
         type : ObjectId,
@@ -22,6 +22,9 @@ const feedbackSchema = new Schema({
     stars : {
         type : Number,
         required : true
+    },
+    reply : {
+        type : String
     }
 },{timestamps:true})
 
