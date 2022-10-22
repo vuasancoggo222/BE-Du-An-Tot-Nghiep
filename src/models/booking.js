@@ -42,7 +42,10 @@ const userSchema = new Schema(
         type : ObjectId,
         ref : "Service"
       }
-    ]
+    ],
+    bookingPrice : {
+      type : Number
+    }
   },
   { timestamps: true }
 );
