@@ -73,7 +73,7 @@ export const changeStatusAccount = async (req,res) => {
   const {status,phone} = req.query
 
   try {
-    const user = await Users.findOneAndUpdate({phone},{status : status},{new : true}).select('-password').exec()
+    const user = await Users.findOneAndUpdate({phoneNumber : phone},{status : status},{new : true}).select('-password').exec()
     return res.json({
       message : "Success",
       user

@@ -25,6 +25,10 @@ const feedbackSchema = new Schema({
     },
     reply : {
         type : String
+    },
+    userReply : {
+        type : ObjectId,
+        ref : 'Users'
     }
 },{timestamps:true})
 
