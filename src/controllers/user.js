@@ -50,6 +50,15 @@ try {
     const user = await User.findOneAndUpdate({id : req.params.id},updateData,{new:true}).select('-password').exec()
     return res.json(user)
 } catch (error) {
-    return res.status(400).json(error.message)
+    return res.status(400).json()
 }
 }
+export const getOneUser = async (req,res) => {
+ 
+    try {
+        const userProfile = await User.findByIdAndUpdate({_id : req.params.id}).select('-password').exec()
+        return res.json(userProfile)
+    } catch (error) {
+        return res.status(400).json(error.message)
+    }
+    }
