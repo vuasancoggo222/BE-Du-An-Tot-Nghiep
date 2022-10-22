@@ -2,7 +2,7 @@ import { Router } from "express";
 import { createBooking, employeeBookingList, listBooking, read, updateStatus, userBookingList } from "../controllers/booking";
 import { firebaseVerifyIdToken } from "../middlewares/firebaseVerifyIdToken";
 const router = Router();
-router.post("/booking",firebaseVerifyIdToken, createBooking);
+router.post("/booking",firebaseVerifyIdToken,createBooking);
 router.get("/booking", listBooking);
 router.get("/booking/:id", read);
 router.patch("/booking/:id", updateStatus);

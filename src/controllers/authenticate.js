@@ -3,7 +3,6 @@ import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {
-  const phoneContact = req.body.phoneNumber
   try {
     const existUser = await Users.findOne({ phoneNumber : req.body.phoneNumber }).exec();
     if (existUser) {
@@ -71,11 +70,10 @@ export const signin = async (req,res) => {
   }
 }
 export const changeStatusAccount = async (req,res) => {
-  const {status} = req.query
-  const phone = req.query.phone
-  const phoneNumber = `+${phone}`
+  const {status,phone} = req.query
+
   try {
-    const user = await Users.findOneAndUpdate({phoneNumber},{status : status},{new : true}).select('-password').exec()
+    const user = await Users.findOneAndUpdate({phone},{status : status},{new : true}).select('-password').exec()
     return res.json({
       message : "Success",
       user
