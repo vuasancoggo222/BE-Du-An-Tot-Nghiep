@@ -18,6 +18,18 @@ export const listFeedBackByService = async (req,res) => {
         const listFeedback = await Feedback.find({service : req.params.svid}).populate({ path: 'user', select: ['name','_id','avatar'] }).exec()
         res.json(listFeedback)
     } catch (error) {
-        res.json(error.message)
+        res.status(400).json(error.message)
     }
+}
+export const adminReplyFeedback = async (req,res) => {
+  const update = {
+    reply : req.body.reply
+  }
+  try {
+     const replyFeedback = await Feedback.findOneAndUpdate({_id : req.params.id},update,{new:true})
+     const message = 'Trả lời thành công'
+     res.json({message,replyFeedback})
+  } catch (error) {
+   return res.status(400).json(error.message)
+  }
 }

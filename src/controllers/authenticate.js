@@ -46,7 +46,7 @@ export const signin = async (req,res) => {
     })
   }
   else if(user.status == 1){
-    const token = jwt.sign({_id: user._id},"datn",{expiresIn : "24h"},{algorithm :'HS256'})
+    const token = jwt.sign({_id: user._id,role : user.role},"datn",{expiresIn : "24h"},{algorithm :'HS256'})
     const match = await bcrypt.compare(password,user.password)
     if(match){
       return res.json({
