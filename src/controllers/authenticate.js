@@ -36,12 +36,14 @@ export const signin = async (req,res) => {
   }
   if(user.status == 0){
     return res.status(400).json({
-      message : "Tài khoản bạn chưa xác thực"
+      message : "Tài khoản bạn chưa xác thực",
+      code : 'NEEDVERIFY'
     })
   }
   else if(user.status == 2){
     return res.status(400).json({
-      message : "Tài khoản bạn bị khoá"
+      message : "Tài khoản bạn bị khoá",
+      code : 'LOCKACCOUNT'
     })
   }
   else if(user.status == 1){
