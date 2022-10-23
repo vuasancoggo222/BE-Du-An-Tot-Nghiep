@@ -47,7 +47,7 @@ export const updateUser = async (req,res) =>{
         status : req.body.status,
     }
 try {
-    const user = await User.findOneAndUpdate({id : req.params.id},updateData,{new:true}).select('-password').exec()
+    const user = await User.findOneAndUpdate({_id : req.params.id},updateData,{new:true}).select('-password').exec()
     return res.json(user)
 } catch (error) {
     return res.status(400).json()
