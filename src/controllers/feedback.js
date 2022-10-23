@@ -14,11 +14,25 @@ export const serviceFeedback = async (req, res) => {
 
 export const listFeedBackByService = async (req, res) => {
   try {
+    const calculateRating = await Feedback.aggregate([
+      {"$unwind":"$service"},
+      {
+        "$group":{
+          "_id" : "$service",
+          "ratingAvg" : {"$avg":"$stars"}
+        }
+      }
+    ])
+    console.log(calculateRating[0]);
     const listFeedback = await Feedback.find({ service: req.params.svid }).sort({stars : "desc"})
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
       .exec();
-    res.json(listFeedback);
+  
+    res.json({
+      listFeedback,
+      ratingAvg : calculateRating[0].ratingAvg
+    });
   } catch (error) {
     res.status(400).json(error.message);
   }
