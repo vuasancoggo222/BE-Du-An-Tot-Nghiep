@@ -14,7 +14,7 @@ export const serviceFeedback = async (req, res) => {
 
 export const listFeedBackByService = async (req, res) => {
   try {
-    const listFeedback = await Feedback.find({ service: req.params.svid })
+    const listFeedback = await Feedback.find({ service: req.params.svid }).sort({stars : "desc"})
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
       .exec();
