@@ -1,5 +1,5 @@
 import Feedback from "../models/feedback";
-
+import mongoose from "mongoose";
 export const serviceFeedback = async (req, res) => {
   req.body.feedbackType = "service";
   try {
@@ -13,6 +13,7 @@ export const serviceFeedback = async (req, res) => {
 };
 
 export const listFeedBackByService = async (req, res) => {
+  let starsByLevel = {}
   try {
     const calculateRating = await Feedback.aggregate([
       {"$unwind":"$service"},
@@ -23,7 +24,12 @@ export const listFeedBackByService = async (req, res) => {
         }
       }
     ])
-    console.log(calculateRating[0]);
+    const rating = calculateRating.find(item => item._id == req.params.svid)
+   
+    for(let i=1 ; i < 6 ; i++){
+      const countDocuments = await Feedback.countDocuments({service : req.params.svid,stars : i})
+      starsByLevel[`${i}star`] = countDocuments
+    }
     const listFeedback = await Feedback.find({ service: req.params.svid }).sort({stars : "desc"})
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
@@ -31,7 +37,8 @@ export const listFeedBackByService = async (req, res) => {
   
     res.json({
       listFeedback,
-      ratingAvg : calculateRating[0].ratingAvg
+      ratingAvg : rating.ratingAvg,
+      starsByLevel
     });
   } catch (error) {
     res.status(400).json(error.message);
