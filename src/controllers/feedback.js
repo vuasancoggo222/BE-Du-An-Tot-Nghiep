@@ -13,6 +13,7 @@ export const serviceFeedback = async (req, res) => {
 };
 
 export const listFeedBackByService = async (req, res) => {
+  const {stars} = req.query
   let starsByLevel = {}
   try {
     const calculateRating = await Feedback.aggregate([
@@ -30,12 +31,23 @@ export const listFeedBackByService = async (req, res) => {
       const countDocuments = await Feedback.countDocuments({service : req.params.svid,stars : i})
       starsByLevel[`${i}star`] = countDocuments
     }
+    if(stars){
+      const listFeedback = await Feedback.find({ service: req.params.svid, stars }).sort({stars : -1})
+      .populate({ path: "user", select: ["name", "_id", "avatar"] })
+      .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
+      .exec();
+      return res.json({
+        listFeedback,
+        ratingAvg : rating.ratingAvg,
+        starsByLevel
+      });
+    }
     const listFeedback = await Feedback.find({ service: req.params.svid }).sort({stars : "desc"})
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
       .exec();
   
-    res.json({
+    return res.json({
       listFeedback,
       ratingAvg : rating.ratingAvg,
       starsByLevel
