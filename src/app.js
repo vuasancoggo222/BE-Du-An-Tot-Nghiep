@@ -8,7 +8,10 @@ import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
-import { initializeApp } from 'firebase-admin/app';
+import {
+  initializeApp
+} from 'firebase-admin/app';
+import BannerRouter from "./routes/banner"
 import userRouter from './routes/user'
 import feedbackRouter from './routes/feedback'
 const app = express();
@@ -20,13 +23,14 @@ admin.initializeApp({
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
-app.use("/api",authRouter);
+app.use("/api", authRouter);
 app.use("/api", serviceRouter);
 app.use("/api", bookingRouter);
-app.use("/api",userRouter)
+app.use("/api", userRouter)
 app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
+app.use("/api", BannerRouter);
 app.listen(process.env.PORT, () => {
   console.log(`Server is running`);
 });
