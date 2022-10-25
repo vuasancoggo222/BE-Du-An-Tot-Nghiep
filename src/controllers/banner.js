@@ -11,3 +11,15 @@ export const post = async (req, res) => {
     }
 
 }
+// update sản phẩm
+export const update = async (req, res) => {
+    try {
+        const UpdateBanner = await Banner.findByIdAndUpdate(req.params.id, req.body)
+        res.json(UpdateBanner);
+    } catch (error) {
+        res.status(400).json({
+            message: "Không update thành công"
+        })
+    }
+
+}
