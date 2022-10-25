@@ -32,7 +32,7 @@ export const listFeedBackByService = async (req, res) => {
       starsByLevel[`${i}star`] = countDocuments
     }
     if(stars){
-      const listFeedback = await Feedback.find({ service: req.params.svid, stars }).sort({stars : -1})
+      const listFeedback = await Feedback.find({ service: req.params.svid, stars }).sort({createdAt : -1})
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
       .exec();
