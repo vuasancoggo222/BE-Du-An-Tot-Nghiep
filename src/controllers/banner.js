@@ -46,3 +46,15 @@ export const list = async (req, res) => {
     }
 
 }
+// Xóa  banners
+export const remove = async (req, res) => {
+    try {
+        const removeBanner = await Banner.findByIdAndDelete(req.params.id)
+        res.json(removeBanner);
+    } catch (error) {
+        res.status(400).json({
+            message: "Không tìm được sản phẩm anh eiii"
+        })
+    }
+
+}
