@@ -34,3 +34,15 @@ export const read = async (req, res) => {
         })
     }
 }
+// Hiển thị danh sách banners
+export const list = async (req, res) => {
+    try {
+        const ListBanner = await Banner.find();
+        res.json(ListBanner);
+    } catch (error) {
+        res.status(400).json({
+            message: "Không tìm được sản phẩm anh eiii"
+        })
+    }
+
+}
