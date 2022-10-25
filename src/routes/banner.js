@@ -3,11 +3,13 @@ import {
 } from "express";
 import {
     post,
-    update
+    update,
+    read
 
 } from "../controllers/banner";
 const router = Router()
 router.post('/banners', post)
 router.patch('/banners/:id', update)
+router.get('/banners/:id', read)
 
 export default router;

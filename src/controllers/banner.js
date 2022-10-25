@@ -1,17 +1,17 @@
 import Banner from "../models/banner";
-// thêm sản phẩm
+// thêm banner
 export const post = async (req, res) => {
     try {
         const banner = await new Banner(req.body).save();
         res.json(banner);
     } catch (error) {
         res.status(400).json({
-            message: "Không thêm được sản phẩm"
+            message: "Không thêm được banner"
         })
     }
 
 }
-// update sản phẩm
+// update banner
 export const update = async (req, res) => {
     try {
         const UpdateBanner = await Banner.findByIdAndUpdate(req.params.id, req.body)
@@ -22,4 +22,15 @@ export const update = async (req, res) => {
         })
     }
 
+}
+// hiển thị chi tiết banner
+export const read = async (req, res) => {
+    try {
+        const readBanner = await Banner.findById(req.params.id);
+        res.json(readBanner);
+    } catch (error) {
+        res.status(400).json({
+            message: "Không tìm được sản phẩm anh eiii"
+        })
+    }
 }
