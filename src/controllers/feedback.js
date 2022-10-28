@@ -13,44 +13,52 @@ export const serviceFeedback = async (req, res) => {
 };
 
 export const listFeedBackByService = async (req, res) => {
-  const {stars} = req.query
-  let starsByLevel = {}
+  const { stars } = req.query;
+  let starsByLevel = {};
   try {
     const calculateRating = await Feedback.aggregate([
-      {"$unwind":"$service"},
+      { $unwind: "$service" },
       {
-        "$group":{
-          "_id" : "$service",
-          "ratingAvg" : {"$avg":"$stars"}
-        }
-      }
-    ])
-    const rating = calculateRating.find(item => item._id == req.params.svid)
-   
-    for(let i=1 ; i < 6 ; i++){
-      const countDocuments = await Feedback.countDocuments({service : req.params.svid,stars : i})
-      starsByLevel[`${i}star`] = countDocuments
+        $group: {
+          _id: "$service",
+          ratingAvg: { $avg: "$stars" },
+        },
+      },
+    ]);
+    const rating = calculateRating.find((item) => item._id == req.params.svid);
+
+    for (let i = 1; i < 6; i++) {
+      const countDocuments = await Feedback.countDocuments({
+        service: req.params.svid,
+        stars: i,
+      });
+      starsByLevel[`${i}star`] = countDocuments;
     }
-    if(stars){
-      const listFeedback = await Feedback.find({ service: req.params.svid, stars }).sort({createdAt : -1})
-      .populate({ path: "user", select: ["name", "_id", "avatar"] })
-      .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
-      .exec();
+    if (stars) {
+      const listFeedback = await Feedback.find({
+        service: req.params.svid,
+        stars,
+      })
+        .sort({ createdAt: -1 })
+        .populate({ path: "user", select: ["name", "_id", "avatar"] })
+        .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
+        .exec();
       return res.json({
         listFeedback,
-        ratingAvg : rating.ratingAvg,
-        starsByLevel
+        ratingAvg: rating.ratingAvg,
+        starsByLevel,
       });
     }
-    const listFeedback = await Feedback.find({ service: req.params.svid }).sort({stars : "desc"})
+    const listFeedback = await Feedback.find({ service: req.params.svid })
+      .sort({ stars: "desc" })
       .populate({ path: "user", select: ["name", "_id", "avatar"] })
       .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
       .exec();
-  
+
     return res.json({
       listFeedback,
-      ratingAvg : rating.ratingAvg,
-      starsByLevel
+      ratingAvg: rating.ratingAvg,
+      starsByLevel,
     });
   } catch (error) {
     res.status(400).json(error.message);
@@ -71,5 +79,15 @@ export const adminReplyFeedback = async (req, res) => {
     res.json({ message, replyFeedback });
   } catch (error) {
     return res.status(400).json(error.message);
+  }
+};
+export const listFeedback = async (req, res) => {
+  try {
+    const feedback = await Feedback.find({}).sort({ createdAt: -1 }).exec();
+    res.json(feedback);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
