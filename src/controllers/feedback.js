@@ -83,7 +83,11 @@ export const adminReplyFeedback = async (req, res) => {
 };
 export const listFeedback = async (req, res) => {
   try {
-    const feedback = await Feedback.find({}).sort({ createdAt: -1 }).exec();
+    const feedback = await Feedback.find({})
+      .sort({ createdAt: -1 })
+      .populate({ path: "user", select: ["name", "_id", "avatar"] })
+      .populate({ path: "userReply", select: ["name", "_id", "avatar"] })
+      .exec();
     res.json(feedback);
   } catch (error) {
     res.status(400).json({
