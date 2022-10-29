@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 const { ObjectId } = mongoose.Types;
 
-const userSchema = new Schema(
+const bookingSchema = new Schema(
   {
     name: {
       type: String,
@@ -49,4 +49,5 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-export default mongoose.model("Booking", userSchema);
+bookingSchema.index({employeeId : -1})
+export default mongoose.model("Booking", bookingSchema);
