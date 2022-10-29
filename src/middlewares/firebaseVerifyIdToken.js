@@ -1,6 +1,6 @@
 import {getAuth} from 'firebase-admin/auth'
 export const firebaseVerifyIdToken = async (req,res,next) =>{
-    const tokenHeaders =req.headers['authorization'] ? req.headers['authorization'].split(" ") : null
+    const tokenHeaders = req.headers['authorization'] ? req.headers['authorization'].split(" ") : null
     console.log(tokenHeaders);
     if(!tokenHeaders){
         return res.status(401).json({
