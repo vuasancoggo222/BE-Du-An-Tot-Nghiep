@@ -93,3 +93,17 @@ export const employeeBookingList = async (req,res) =>{
   }
 }
 
+export const bookingGenderStatistics = async (req,res) => {
+  try {
+    if(req.query.svid){
+      const male = await Booking.countDocuments({gender : 'male',status : 4,serviceId:{$in :[req.query.svid]}}).exec()
+      const female = await Booking.countDocuments({gender : 'female',status: 4,serviceId:{$in :[req.query.svid]}}).exec()
+      return res.json({ male,female})
+    }
+    const male = await Booking.countDocuments({gender : 'male',status : 4}).exec()
+    const female = await Booking.countDocuments({gender : 'female',status: 4}).exec()
+    return res.json({ male,female})
+  } catch (error) {
+    res.status(400).json(error.message)
+  }
+}
