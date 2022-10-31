@@ -32,7 +32,7 @@ export const listFeedBackByService = async (req, res) => {
         service: req.params.svid,
         stars: i,
       });
-      starsByLevel[`${i}star`] = countDocuments;
+      starsByLevel[`star${i}`] = countDocuments;
     }
     if (stars) {
       const listFeedback = await Feedback.find({
