@@ -43,6 +43,9 @@ const bookingSchema = new Schema(
         ref : "Service"
       }
     ],
+    gender:{
+      type : String,
+    },
     bookingPrice : {
       type : Number
     }

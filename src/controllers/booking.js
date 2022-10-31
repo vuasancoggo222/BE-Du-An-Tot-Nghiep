@@ -13,6 +13,7 @@ export const createBooking = async (req, res) => {
       date: req.body.date,
       time: req.body.time,
       age : req.body.age,
+      gender : req.body.gender,
       bookingPrice:req.body.bookingPrice
     }).save();
     return res.json(booking);
