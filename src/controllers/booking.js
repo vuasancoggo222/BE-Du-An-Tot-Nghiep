@@ -51,7 +51,7 @@ export const read = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
-    if(req.body.status == 3){
+    if(req.body.status == 4){
       const booking = await Booking.findOneAndUpdate(
         { _id: req.params.id },req.body).exec();
         await User.findOneAndUpdate({_id : booking.userId},{$push : {serviceUsed : booking.serviceId}})

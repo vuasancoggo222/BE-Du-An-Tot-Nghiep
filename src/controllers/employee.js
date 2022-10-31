@@ -72,7 +72,7 @@ export const employeeOrderStatistics = async (req, res) => {
       const totalBooking = await Booking.countDocuments({
         employeeId: employee[i]._id,
       }).exec();
-      const unconfimred = await Booking.countDocuments({
+      const unConfimred = await Booking.countDocuments({
         employeeId: employee[i]._id,
         status: 0,
       }).exec();
@@ -80,20 +80,25 @@ export const employeeOrderStatistics = async (req, res) => {
         employeeId: employee[i]._id,
         status: 1,
       }).exec();
-      const finished = await Booking.countDocuments({
+      const canceled = await Booking.countDocuments({
         employeeId: employee[i]._id,
         status: 2,
       }).exec();
-      const canceled = await Booking.countDocuments({
+      const waitToPay = await Booking.countDocuments({
+        employeeId: employee[i]._id,
+        status: 3,
+      }).exec();
+      const finished = await Booking.countDocuments({
         employeeId: employee[i]._id,
         status: 3,
       }).exec();
       const status = {
         employee : employee[i],
         totalBooking,
-        unconfimred,
+        unConfimred,
         confirmed,
         finished,
+        waitToPay,
         canceled,
       };
       statistics.push(status);
