@@ -11,7 +11,8 @@ export const createBooking = async (req, res) => {
       serviceId: req.body.serviceId,
       employeeId: req.body.employeeId,
       date: req.body.date,
-      time: req.body.time
+      time: req.body.time,
+      bookingPrice:req.body.bookingPrice
     }).save();
     return res.json(booking);
   } catch (error) {
