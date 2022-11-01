@@ -1,6 +1,8 @@
 import { mongoose } from "mongoose";
 import Booking from "../models/booking";
-import User from '../models/user'
+import User from "../models/user";
+import moment from "moment";
+
 export const createBooking = async (req, res) => {
   try {
     const booking = await new Booking({
@@ -12,9 +14,9 @@ export const createBooking = async (req, res) => {
       employeeId: req.body.employeeId,
       date: req.body.date,
       time: req.body.time,
-      age : req.body.age,
-      gender : req.body.gender,
-      bookingPrice:req.body.bookingPrice
+      age: req.body.age,
+      gender: req.body.gender,
+      bookingPrice: req.body.bookingPrice,
     }).save();
     return res.json(booking);
   } catch (error) {
@@ -26,11 +28,11 @@ export const createBooking = async (req, res) => {
 export const listBooking = async (req, res) => {
   try {
     const booking = await Booking.find({})
-      .sort({createdAt : -1})
+      .sort({ createdAt: -1 })
       .populate({ path: "userId", select: "-password" })
       .populate("serviceId")
       .populate({ path: "employeeId", select: "-idCard" })
-      
+
       .exec();
     return res.json(booking);
   } catch (error) {
@@ -53,15 +55,21 @@ export const read = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
-    if(req.body.status == 4){
+    if (req.body.status == 4) {
       const booking = await Booking.findOneAndUpdate(
-        { _id: req.params.id },req.body).exec();
-        await User.findOneAndUpdate({_id : booking.userId},{$push : {serviceUsed : booking.serviceId}})
-        return res.json(booking);
-    }
-    else{
+        { _id: req.params.id },
+        req.body
+      ).exec();
+      await User.findOneAndUpdate(
+        { _id: booking.userId },
+        { $push: { serviceUsed: booking.serviceId } }
+      );
+      return res.json(booking);
+    } else {
       const booking = await Booking.findOneAndUpdate(
-        { _id: req.params.id },req.body).exec();
+        { _id: req.params.id },
+        req.body
+      ).exec();
       return res.json(booking);
     }
   } catch (error) {
@@ -71,39 +79,86 @@ export const updateStatus = async (req, res) => {
   }
 };
 
-export const userBookingList = async (req,res) =>{
+export const userBookingList = async (req, res) => {
   try {
-    const listBooking = await Booking.find({userId : req.params.id}).populate('serviceId').exec()
-    return res.json(listBooking)
+    const listBooking = await Booking.find({ userId: req.params.id })
+      .populate("serviceId")
+      .exec();
+    return res.json(listBooking);
   } catch (error) {
     return res.status(400).json({
-      message : error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
 
-export const employeeBookingList = async (req,res) =>{
+export const employeeBookingList = async (req, res) => {
   try {
-    const listBooking = await Booking.find({employeeId : req.params.id}).exec()
-    return res.json(listBooking)
+    const listBooking = await Booking.find({
+      employeeId: req.params.id,
+    }).exec();
+    return res.json(listBooking);
   } catch (error) {
     return res.status(400).json({
-      message : error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
 
-export const bookingGenderStatistics = async (req,res) => {
+export const bookingGenderStatistics = async (req, res) => {
+  const { svid ,timeStart,timeEnd} = req.query;
   try {
-    if(req.query.svid){
-      const male = await Booking.countDocuments({gender : 'male',status : 4,serviceId:{$in :[req.query.svid]}}).exec()
-      const female = await Booking.countDocuments({gender : 'female',status: 4,serviceId:{$in :[req.query.svid]}}).exec()
-      return res.json({ male,female})
+    if (svid && !timeStart || !timeEnd){
+      const male = await Booking.countDocuments({
+        gender: "male",
+        status: 4,
+        serviceId: { $in: [svid] },
+      }).exec();
+      const female = await Booking.countDocuments({
+        gender: "female",
+        status: 4,
+        serviceId: { $in: [svid] },
+      }).exec();
+      return res.json({ male, female });
+    } else if (timeStart && timeEnd && !svid) {
+      const male = await Booking.countDocuments({
+        gender: "male",
+        status: 4,
+        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+      }).exec();
+      const female = await Booking.countDocuments({
+        gender: "female",
+        status: 4,
+        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+      }).exec();
+      return res.json({ male, female });
     }
-    const male = await Booking.countDocuments({gender : 'male',status : 4}).exec()
-    const female = await Booking.countDocuments({gender : 'female',status: 4}).exec()
-    return res.json({ male,female})
+    else if(timeStart && timeEnd && svid){
+      const male = await Booking.countDocuments({
+        gender: "male",
+        status: 4,
+        serviceId: { $in: [svid] },
+        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+      }).exec();
+      const female = await Booking.countDocuments({
+        gender: "female",
+        status: 4,
+        serviceId: { $in: [svid] },
+        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+      }).exec();
+      return res.json({ male, female });
+    } else {
+      const male = await Booking.countDocuments({
+        gender: "male",
+        status: 4,
+      }).exec();
+      const female = await Booking.countDocuments({
+        gender: "female",
+        status: 4,
+      }).exec();
+      return res.json({ male, female });
+    }
   } catch (error) {
-    res.status(400).json(error.message)
+    res.status(400).json(error.message);
   }
-}
+};

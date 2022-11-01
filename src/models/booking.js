@@ -48,7 +48,7 @@ const bookingSchema = new Schema(
     },
     bookingPrice : {
       type : Number
-    }
+    },
   },
   { timestamps: true }
 );
