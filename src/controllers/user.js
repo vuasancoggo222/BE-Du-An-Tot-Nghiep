@@ -62,3 +62,20 @@ export const getOneUser = async (req,res) => {
         return res.status(400).json(error.message)
     }
     }
+
+export const userAccountStatistics = async (req,res) =>{
+    try {
+        const totalUser = await User.countDocuments({}).exec()
+        const unActiveUser = await User.countDocuments({status : 0}).exec()
+        const availableUser = await User.countDocuments({status : 1}).exec()
+        const lockUser = await User.countDocuments({status : 2}).exec()
+        return res.json({
+            totalUser,
+            unActiveUser,
+            availableUser,
+            lockUser
+        })
+    } catch (error) {
+        return res.json(error.message)
+    }
+}
