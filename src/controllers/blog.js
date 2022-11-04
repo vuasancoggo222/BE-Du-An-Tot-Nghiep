@@ -39,3 +39,12 @@ export const deleteBlog = async (req,res) => {
         return res.json(error.message)
     }
 }
+
+export const getDetailBlog = async (req,res) => {
+    try {
+        const blog = await Blog.findOne({slug : req.params.slug}).exec()
+        return res.json(blog)
+    } catch (error) {
+       return res.json(error.message) 
+    }
+}

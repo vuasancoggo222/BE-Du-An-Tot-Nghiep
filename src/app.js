@@ -9,6 +9,7 @@ import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
+import blogRouter from './routes/blog'
 import http from "http";
 import { Server } from "socket.io";
 import { initializeApp } from "firebase-admin/app";
@@ -40,6 +41,7 @@ app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
+app.use('/api',blogRouter)
 io.on("connection", async (socket) => {
    
     socket.on('newNotification', async  (data)=>{

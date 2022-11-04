@@ -7,6 +7,12 @@ const blogSchema = new Schema({
         required : true,
         minLength : 16
     },
+    thumbnail : {
+        type : String
+    },
+    shortDescription : {
+        type : String
+    },
     content : {
         type : String,
         required : true,
