@@ -10,7 +10,7 @@ const blogSchema = new Schema({
     content : {
         type : String,
         required : true,
-        minLength : 100,
+        minLength : 32,
     },
     user : {
         type : ObjectId,
