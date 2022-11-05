@@ -3,11 +3,13 @@ import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
 import "dotenv/config";
+import Notification from "./models/notification";
 import serviceRouter from "./routes/service";
 import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
+import blogRouter from './routes/blog'
 import http from "http";
 import { Server } from "socket.io";
 import { initializeApp } from "firebase-admin/app";
@@ -39,18 +41,21 @@ app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
-io.on("connection",  (socket) => {
-    socket.on('newNotification', async (data)=>{
+app.use('/api',blogRouter)
+io.on("connection", async (socket) => {
+   
+    socket.on('newNotification', async  (data)=>{
         const notification = {
           bookingId : data.id,
           notificationType : data.type,
           text : data.text
         }
         newNotification(notification)
-        const listNotification = await getListAdminNotification()
-        socket.emit('notification',listNotification)
+        const sendNotification = await Notification.findOne({bookingId : data.id}).exec()
+        socket.emit('newNotification',sendNotification)
     })
-    
+    const listNotification = await getListAdminNotification()
+    socket.emit('notification',listNotification)
     socket.on("disconnect", (reason) => {
       console.log(`disconnect ${socket.id} due to ${reason}`);
     });
