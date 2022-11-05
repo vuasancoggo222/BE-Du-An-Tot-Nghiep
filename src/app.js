@@ -50,7 +50,7 @@ io.on("connection", async (socket) => {
           notificationType : data.type,
           text : data.text
         }
-        newNotification(notification)
+        await newNotification(notification)
         const sendNotification = await Notification.findOne({bookingId : data.id}).exec()
         socket.emit('newNotification',sendNotification)
     })
