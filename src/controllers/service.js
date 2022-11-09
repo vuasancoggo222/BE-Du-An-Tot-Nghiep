@@ -1,6 +1,7 @@
 import Service from "../models/service";
 
 import slugify from "slugify";
+import Booking from "../models/booking";
 export const createService = async (req, res) => {
   req.body.slug = slugify(req.body.name);
   try {
@@ -78,4 +79,26 @@ export const readslug = async (req, res) => {
   }
 };
 
-
+export const groupAgeByService = async (req,res) => {
+  try {
+    const serviceId = await Service.distinct('_id')
+    let groupAge = []
+    for (let svid of serviceId){
+      const service = await Service.findOne({_id : svid}).exec()
+      const group1 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gte : 0 ,$lte:16}})
+      const group2 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gte : 17 ,$lte:24}})
+      const group3 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gte : 25 ,$lte:34}})
+      const group4 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gte : 35 ,$lte:45}})
+      const group5 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gte : 46 ,$lte:60}})
+      const group6 = await Booking.countDocuments({status : 4, serviceId: { $in: [svid] },age : {$gt : 60 }})
+      
+      groupAge.push({
+        name : service.name,
+        data : [group1,group2,group3,group4,group5,group6]
+      })
+    }
+    return res.json({groupAge,categories : ["0-16","17-24","25-34","35-45","46-60",">60"]})
+  } catch (error) {
+    return res.status(400).json(error.message)
+  }
+}
