@@ -9,7 +9,7 @@ import authRouter from "./routes/authenticate";
 import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
-import blogRouter from './routes/blog'
+import blogRouter from "./routes/blog";
 import http from "http";
 import { Server } from "socket.io";
 import { initializeApp } from "firebase-admin/app";
@@ -19,17 +19,23 @@ import feedbackRouter from "./routes/feedback";
 const app = express();
 import admin from "firebase-admin";
 import serviceAccount from "../serviceAccountKey.json";
-import { getListAdminNotification, newNotification } from "./controllers/notification";
+import {
+  getListAdminNotification,
+  newNotification,
+} from "./controllers/notification";
 const httpServer = http.createServer(app);
-export const io = new Server(httpServer,{
-  cors : {
-    origin : '*',
-    methods: ['GET']
-  }
+export const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET"],
+  },
 });
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+var bodyParser = require("body-parser");
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
@@ -41,25 +47,26 @@ app.use("/api", contactRouter);
 app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
-app.use('/api',blogRouter)
+app.use("/api", blogRouter);
 io.on("connection", async (socket) => {
-   
-    socket.on('newNotification', async  (data)=>{
-        const notification = {
-          bookingId : data.id,
-          notificationType : data.type,
-          text : data.text
-        }
-        newNotification(notification)
-        const sendNotification = await Notification.findOne({bookingId : data.id}).exec()
-        socket.emit('newNotification',sendNotification)
-    })
-    const listNotification = await getListAdminNotification()
-    socket.emit('notification',listNotification)
-    socket.on("disconnect", (reason) => {
-      console.log(`disconnect ${socket.id} due to ${reason}`);
-    });
+  socket.on("newNotification", async (data) => {
+    const notification = {
+      bookingId: data.id,
+      notificationType: data.type,
+      text: data.text,
+    };
+    newNotification(notification);
+    const sendNotification = await Notification.findOne({
+      bookingId: data.id,
+    }).exec();
+    socket.emit("newNotification", sendNotification);
   });
+  const listNotification = await getListAdminNotification();
+  socket.emit("notification", listNotification);
+  socket.on("disconnect", (reason) => {
+    console.log(`disconnect ${socket.id} due to ${reason}`);
+  });
+});
 httpServer.listen(process.env.PORT, () => {
   console.log(`Server is running`);
 });
