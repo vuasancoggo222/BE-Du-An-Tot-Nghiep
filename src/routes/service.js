@@ -7,6 +7,7 @@ import {
   unactiveService,
   update,
   readslug,
+  groupAgeByService,
 } from "../controllers/service";
 
 const router = Router();
@@ -16,4 +17,5 @@ router.patch("/service/:id", update);
 router.delete("/service/:id", remove);
 router.get("/service-slug/:slug", readslug);
 router.get("/service/:id", read);
+router.get('/age-by-service',groupAgeByService)
 export default router;
