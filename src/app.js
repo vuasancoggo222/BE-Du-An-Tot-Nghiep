@@ -20,8 +20,9 @@ const app = express();
 import admin from "firebase-admin";
 import serviceAccount from "../serviceAccountKey.json";
 import { getListAdminNotification, newNotification } from "./controllers/notification";
+import { getListUserByRole } from "./utils/getListUserByRole";
 const httpServer = http.createServer(app);
-export const io = new Server(httpServer,{
+const io = new Server(httpServer,{
   cors : {
     origin : '*',
     methods: ['GET']
@@ -43,6 +44,16 @@ app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use('/api',blogRouter)
 io.on("connection", async (socket) => {
+    let connectUsers = []
+    const addNewUser = (id, socketId) => {
+      !connectUsers.some((id) => id === id) &&
+      connectUsers.push({ id, socketId });
+      console.log(connectUsers);
+    };
+   
+    socket.on('newUser',(data)=>{
+      addNewUser(data,socket.id)
+    })
    
     socket.on('newNotification', async  (data)=>{
         const notification = {
@@ -50,9 +61,10 @@ io.on("connection", async (socket) => {
           notificationType : data.type,
           text : data.text
         }
-        await newNotification(notification)
-        const sendNotification = await Notification.findOne({bookingId : data.id}).exec()
-        socket.emit('newNotification',sendNotification)
+        const sendNotification = await newNotification(notification)
+        io.emit('newNotification',sendNotification)
+        const listNotification = await getListAdminNotification()
+        socket.emit('updateNotification',listNotification)
     })
     const listNotification = await getListAdminNotification()
     socket.emit('notification',listNotification)
@@ -60,6 +72,7 @@ io.on("connection", async (socket) => {
       console.log(`disconnect ${socket.id} due to ${reason}`);
     });
   });
+;
 httpServer.listen(process.env.PORT, () => {
   console.log(`Server is running`);
 });

@@ -11,6 +11,10 @@ notificationType : {
 },
 text : {
     type : String
+},
+readed : {
+    type : Boolean,
+    default : false
 }
 },{timestamps: true})
 
