@@ -157,7 +157,6 @@ export const servicesStatistic = async (req, res) => {
       }
       return res.json(services);
     } else if (timeStart && timeEnd) {
-      console.log(new Date(Number(1667412158494) * 1000).toISOString());
       for (let svid of serviceId) {
         const service = await Service.findOne({ _id: svid }).exec();
         const numberOfService = await Booking.countDocuments({
@@ -186,3 +185,37 @@ export const servicesStatistic = async (req, res) => {
     return res.status(400).json(error.message);
   }
 };
+
+export const turnoverServicesMonth = async (req,res) => {
+ const year = Number(req.query.year)
+  try {
+    let allData = []
+   const serviceId = await Service.distinct('_id')
+    for(let svid of serviceId){
+      let datas = []
+      const service = await Service.findOne({_id : svid}).exec()
+      for(let i = 1 ; i<13; i++){
+        const documents = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},i]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 4]}},
+            {serviceId:{$in:[svid]}}
+          ]}
+        }])
+        
+        // console.log(i,documents.length);
+        const turnoverMonth = Number(service.price * documents.length)
+        
+        datas.push(turnoverMonth)
+      }
+      allData.push({
+        name : service.name,
+        datas
+      })
+    }
+    return res.json(allData)
+  } catch (error) {
+    
+  }
+}
