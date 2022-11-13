@@ -176,8 +176,7 @@ export const servicesStatistic = async (req, res) => {
         }).exec();
         total += Number(numberOfService * service.price);
         const serviceElement = {
-          name: service.name,
-          _id: service._id,
+          service,
           complete: numberOfService,
           turnover: Number(numberOfService * service.price),
         };
@@ -186,7 +185,10 @@ export const servicesStatistic = async (req, res) => {
       for (let i = 0; i < services.length; i++) {
         services[i].percentage = Number(services[i].turnover / total) * 100;
       }
-      return res.json(services);
+      return res.json({
+        services,
+        totalService : serviceId.length
+      });
     } else if (timeStart && timeEnd) {
       for (let svid of serviceId) {
         const service = await Service.findOne({ _id: svid }).exec();
@@ -241,11 +243,14 @@ export const turnoverServicesMonth = async (req,res) => {
         datas.push(turnoverMonth)
       }
       allData.push({
-        name : service.name,
+        service,
         datas
       })
     }
-    return res.json(allData)
+    return res.json({
+      allData,
+      totalServices : serviceId.length
+    })
   } catch (error) {
     
   }
