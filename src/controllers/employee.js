@@ -68,7 +68,17 @@ export const employeeOrderStatistics = async (req, res) => {
   let statistics = [];
   try {
     const employee = await Employee.find({}).select('-idCard').exec();
+    const getTotal = await Booking.aggregate([{$match : { status : 4 }},{$group : {_id : null, sum : {$sum : "$bookingPrice"}}}])
+    const totalTurnOver = getTotal[0].sum;
     for (let i = 0; i < employee.length; i++) {
+      const finishedBooking = await Booking.find({employeeId : employee[i]._id,status : 4}).exec()
+      const turnover = finishedBooking.reduce(
+        (previousValue, currentValue) => previousValue + currentValue.bookingPrice,
+        0
+      );
+
+      const percentage = Number((turnover / totalTurnOver))*100
+      console.log(percentage);
       const totalBooking = await Booking.countDocuments({
         employeeId: employee[i]._id,
       }).exec();
@@ -90,7 +100,7 @@ export const employeeOrderStatistics = async (req, res) => {
       }).exec();
       const finished = await Booking.countDocuments({
         employeeId: employee[i]._id,
-        status: 3,
+        status: 4,
       }).exec();
       const status = {
         employee : employee[i],
@@ -100,10 +110,16 @@ export const employeeOrderStatistics = async (req, res) => {
         finished,
         waitToPay,
         canceled,
+        turnover,
+        percentage
       };
       statistics.push(status);
     }
-    res.json(statistics);
+    res.json({
+      statistics,
+      totalEmployee : employee.length,
+      totalTurnOver
+    });
   } catch (error) {
     return res.status(400).json({
       message: error.message,
