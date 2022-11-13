@@ -130,6 +130,37 @@ export const groupAgeByService = async (req, res) => {
   }
 };
 
+export const groupGenderByService = async (req, res) => {
+  try {
+    const serviceId = await Service.distinct("_id");
+    let groupGender = [];
+    for (let svid of serviceId) {
+      const service = await Service.findOne({ _id: svid }).exec();
+      const group1 = await Booking.countDocuments({
+        status: 4,
+        serviceId: { $in: [svid] },
+        gender: 0,
+      });
+      const group2 = await Booking.countDocuments({
+        status: 4,
+        serviceId: { $in: [svid] },
+        gender: 1,
+      });
+
+      groupGender.push({
+        name: service.name,
+        data: [group1, group2],
+      });
+    }
+    return res.json({
+      groupGender,
+      categories: ["Nam", "Nữ"],
+    });
+  } catch (error) {
+    return res.status(400).json(error.message);
+  }
+};
+
 export const servicesStatistic = async (req, res) => {
   const { timeStart, timeEnd } = req.query;
   try {

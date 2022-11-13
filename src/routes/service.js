@@ -10,6 +10,7 @@ import {
   groupAgeByService,
   servicesStatistic,
   turnoverServicesMonth,
+  groupGenderByService,
 } from "../controllers/service";
 
 const router = Router();
@@ -20,6 +21,7 @@ router.delete("/service/:id", remove);
 router.get("/service-slug/:slug", readslug);
 router.get("/service/:id", read);
 router.get('/age-by-service',groupAgeByService)
+router.get('/gender-by-service',groupGenderByService)
 router.get('/service-statistics',servicesStatistic)
 router.get('/turnover-month-service',turnoverServicesMonth)
 export default router;

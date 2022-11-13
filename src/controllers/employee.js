@@ -90,7 +90,7 @@ export const employeeOrderStatistics = async (req, res) => {
       }).exec();
       const finished = await Booking.countDocuments({
         employeeId: employee[i]._id,
-        status: 3,
+        status: 4,
       }).exec();
       const status = {
         employee : employee[i],
