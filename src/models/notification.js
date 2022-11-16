@@ -11,6 +11,10 @@ notificationType : {
 },
 text : {
     type : String
+},
+userId : {
+    type : ObjectId,
+    ref : 'Users'
 }
 },{timestamps: true})
 

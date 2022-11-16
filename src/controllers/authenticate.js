@@ -1,5 +1,4 @@
 import Users from "../models/user";
-import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
 export const signup = async (req, res) => {

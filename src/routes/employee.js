@@ -7,5 +7,5 @@ router.put("/employees/:id",update)
 router.delete("/employees/:id",deleteEmployee)
 router.get("/employees/:id",read)
 router.get("/employee/order-statistics",employeeOrderStatistics)
-router.get("/statistics-for-employee",statisticsForOneEmployee)
+router.get("/statistics-for-employee/:id",statisticsForOneEmployee)
 export default router;

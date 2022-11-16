@@ -2,6 +2,13 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
+import {
+  addNewUser,
+  onlineUsers,
+  getUser,
+  removeUser,
+  getUserByRole,
+} from "./utils/socketUser";
 import "dotenv/config";
 import Notification from "./models/notification";
 import serviceRouter from "./routes/service";
@@ -19,10 +26,13 @@ import feedbackRouter from "./routes/feedback";
 const app = express();
 import admin from "firebase-admin";
 import serviceAccount from "../serviceAccountKey.json";
+import jwt from "jsonwebtoken";
 import {
   getListAdminNotification,
+  getUserListNotification,
   newNotification,
 } from "./controllers/notification";
+import user from "./models/user";
 const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
   cors: {
@@ -48,7 +58,40 @@ app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
-io.on("connection", async (socket) => {
+
+let socketEmitList = false
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jwt.verify(socket.handshake.query.token, "datn", function (err, decoded) {
+      if (err) return next(new Error("Authentication error"));
+      socket.decoded = decoded;
+      socket.role = decoded.role;
+      next();
+    });
+  } else {
+    next(new Error("Authentication error"));
+  }
+}).on("connection", async (socket) => {
+  socket.on("newUser", async (id) => {
+    
+    addNewUser(id, socket.id, socket.role);
+    const receive = getUser(id);
+    console.log(onlineUsers);
+    const receiverByRole = getUserByRole(2);
+    if(!socketEmitList &&  receiverByRole){
+    const listNotification = await getListAdminNotification();
+    io.to(receiverByRole.socketId).emit("notification", listNotification);
+    socketEmitList = true
+    }
+
+    if(receive){
+      const userListNotification = await getUserListNotification(id);
+    io.to(receive["socketId"]).emit(
+      "userListNotification",
+      userListNotification
+    );
+    }
+  });
   socket.on("newNotification", async (data) => {
     const notification = {
       bookingId: data.id,
@@ -59,14 +102,15 @@ io.on("connection", async (socket) => {
     const sendNotification = await Notification.findOne({
       bookingId: data.id,
     }).exec();
-    io.emit("newNotification", sendNotification);
-    const listNotification = await getListAdminNotification();
-    io.emit("notification", listNotification);
+    const receiverByRole = getUserByRole(2);
+    if(receiverByRole){
+      io.to(receiverByRole.socketId).emit("newNotification", sendNotification);
+      const listNotification = await getListAdminNotification();
+      io.to(receiverByRole.socketId).emit("notification", listNotification);
+    }
   });
-  const listNotification = await getListAdminNotification();
-  socket.emit("notification", listNotification);
   socket.on("disconnect", (reason) => {
-    console.log(`disconnect ${socket.id} due to ${reason}`);
+    removeUser(socket.id);
   });
 });
 httpServer.listen(process.env.PORT, () => {
