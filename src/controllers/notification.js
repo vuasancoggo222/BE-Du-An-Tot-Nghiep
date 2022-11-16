@@ -13,6 +13,15 @@ export const newNotification = async (data) => {
     try {
         const newNotification = await new Notification(data).save()
     } catch (error) {
-        console.log(error);
+       return error
+    }
+}
+
+export const getUserListNotification = async (id) => {
+    try {
+        const listNotification = await Notification.find({userId : id}).sort({createdAt: -1}).exec()
+        return listNotification
+    } catch (error) {
+        return error
     }
 }
