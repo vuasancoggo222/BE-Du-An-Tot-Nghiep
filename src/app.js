@@ -32,7 +32,6 @@ import {
   getUserListNotification,
   newNotification,
 } from "./controllers/notification";
-import user from "./models/user";
 const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
   cors: {
@@ -61,7 +60,8 @@ app.use("/api", blogRouter);
 
 let socketEmitList = false
 io.use((socket, next) => {
-  if (socket.handshake.query && socket.handshake.query.token) {
+ 
+  if (socket.handshake.query.token) {
     jwt.verify(socket.handshake.query.token, "datn", function (err, decoded) {
       if (err) return next(new Error("Authentication error"));
       socket.decoded = decoded;
@@ -73,8 +73,9 @@ io.use((socket, next) => {
   }
 }).on("connection", async (socket) => {
   socket.on("newUser", async (id) => {
-    
     addNewUser(id, socket.id, socket.role);
+   ;
+  
     const receive = getUser(id);
     console.log(onlineUsers);
     const receiverByRole = getUserByRole(2);
@@ -109,6 +110,29 @@ io.use((socket, next) => {
       io.to(receiverByRole.socketId).emit("notification", listNotification);
     }
   });
+  socket.on("newUserNotification", async (data) =>{;
+    const notification = {
+      bookingId: data.id,
+      notificationType: data.type,
+      text: data.text,
+      userId : data.userId
+    };
+    await newNotification(notification);
+    const sendNotification = await Notification.findOne({
+      bookingId: data.id,
+    }).exec();
+    console.log(sendNotification);
+    const receive = getUser(data.id)
+    console.log(receive);
+    if(receive){
+      const userListNotification = await getUserListNotification(id);
+      console.log(userListNotification);
+      io.to(receive["socketId"]).emit(
+      "userListNotification",
+      userListNotification
+      );
+    }
+  })
   socket.on("disconnect", (reason) => {
     removeUser(socket.id);
   });
