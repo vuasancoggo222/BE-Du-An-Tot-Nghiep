@@ -162,12 +162,14 @@ export const groupGenderByService = async (req, res) => {
 };
 
 export const servicesStatistic = async (req, res) => {
-  const { timeStart, timeEnd } = req.query;
+  const month = Number(req.query.month)
+  const year = Number(req.query.year)
   try {
     const serviceId = await Service.distinct("_id");
     let services = [];
     let total = 0;
-    if (!timeStart && !timeEnd) {
+    if (!month && !year) {
+     
       for (let svid of serviceId) {
         const service = await Service.findOne({ _id: svid }).exec();
         const numberOfService = await Booking.countDocuments({
@@ -189,23 +191,48 @@ export const servicesStatistic = async (req, res) => {
         services,
         totalService : serviceId.length
       });
-    } else if (timeStart && timeEnd) {
+    } else if (month && year) {
+    
       for (let svid of serviceId) {
         const service = await Service.findOne({ _id: svid }).exec();
-        const numberOfService = await Booking.countDocuments({
-          serviceId: { $in: [svid] },
-          status: 4,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        total += Number(numberOfService * service.price);
+        const documents = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 4]}},
+            {serviceId:{$in:[svid]}}
+          ]}
+        }])
+        total += Number(documents.length * service.price);
         const serviceElement = {
-          name: service.name,
-          _id: service._id,
-          complete: numberOfService,
-          turnover: Number(numberOfService * service.price),
+          service,
+          complete: documents.length,
+          turnover: Number(documents.length * service.price),
+        };
+        services.push(serviceElement);
+      }
+      for (let i = 0; i < services.length; i++) {
+        services[i].percentage = Number(services[i].turnover / total) * 100;
+      }
+      return res.json(services);
+    }
+    else if(!month && year){
+    
+      for (let svid of serviceId) {
+        const service = await Service.findOne({ _id: svid }).exec();
+        const documents = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 4]}},
+            {serviceId:{$in:[svid]}}
+          ]}
+        }
+        ])
+        total += Number(documents.length * service.price);
+        const serviceElement = {
+          service,
+          complete: documents.length,
+          turnover: Number(documents.length * service.price),
         };
         services.push(serviceElement);
       }
