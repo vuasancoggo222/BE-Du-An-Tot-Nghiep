@@ -1,4 +1,5 @@
 import { redis } from "googleapis/build/src/apis/redis";
+import { finished } from "nodemailer/lib/xoauth2";
 import Booking from "../models/booking";
 import Employee from "../models/employee";
 export const list = async (req, res) => {
@@ -65,11 +66,12 @@ export const deleteEmployee = async (req, res) => {
 };
 
 export const employeeOrderStatistics = async (req, res) => {
-  const { timeStart, timeEnd } = req.query;
+  const month = Number(req.query.month)
+  const year = Number(req.query.year)
   let statistics = [];
   try {
     const employee = await Employee.find({}).select("-idCard").exec();
-    if (!timeStart && !timeEnd) {
+    if (!year && !month) {
       const getTotal = await Booking.aggregate([
         { $match: { status: 4 } },
         { $group: { _id: null, sum: { $sum: "$bookingPrice" } } },
@@ -87,7 +89,6 @@ export const employeeOrderStatistics = async (req, res) => {
         );
 
         const percentage = Number(turnover / totalTurnOver) * 100;
-        console.log(percentage);
         const totalBooking = await Booking.countDocuments({
           employeeId: employee[i]._id,
         }).exec();
@@ -130,93 +131,170 @@ export const employeeOrderStatistics = async (req, res) => {
         totalTurnOver,
       });
     }
-    else if(timeStart && !timeEnd || !timeStart && timeEnd){
-      return res.status(400).json({
-        message : "Vui lòng thêm cả thời gian bắt đầu và kết thúc."
-      })
-    }
-    else if (timeStart && timeEnd) {
-      const getTotal = await Booking.find({status: 4 , date: {
-        $gte: new Date(Number(timeStart) * 1000).toISOString(),
-        $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-      },}).exec()
-      const totalTurnOver = getTotal.reduce((previousValue, currentValue) =>
+    else if(year && !month){
+      
+      const documents = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+        ]}
+      }])
+      const totalTurnOver = documents.reduce((previousValue, currentValue) =>
       previousValue + currentValue.bookingPrice,
     0)
-      console.log(totalTurnOver);
       for (let i = 0; i < employee.length; i++) {
-        const finishedBooking = await Booking.find({
-          employeeId: employee[i]._id,
-          status: 4,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const turnover = finishedBooking.reduce(
+        const totalBooking = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+          ]}
+        }])
+        const unConfimred = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 0]}},
+    
+          ]}
+        }])
+        const confirmed = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 1]}},
+          ]}
+        }])
+        const canceled = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 2]}},
+    
+          ]}
+        }])
+        const waitToPay = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 3]}},
+    
+          ]}
+        }])
+        const finished = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 4]}},
+    
+          ]}
+        }])
+        const turnover = finished.reduce(
           (previousValue, currentValue) =>
             previousValue + currentValue.bookingPrice,
           0
         );
 
         const percentage = Number(turnover / totalTurnOver) * 100;
-        const totalBooking = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const unConfimred = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          status: 0,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const confirmed = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          status: 1,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const canceled = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          status: 2,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const waitToPay = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          status: 3,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
-        const finished = await Booking.countDocuments({
-          employeeId: employee[i]._id,
-          status: 4,
-          date: {
-            $gte: new Date(Number(timeStart) * 1000).toISOString(),
-            $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-          },
-        }).exec();
         const status = {
           employee: employee[i],
-          totalBooking,
-          unConfimred,
-          confirmed,
-          finished,
-          waitToPay,
-          canceled,
-          turnover,
-          percentage,
+          totalBooking : totalBooking.length,
+          unConfimred : unConfimred.length,
+          confirmed : confirmed.length,
+          finished : finished.length,
+          waitToPay : waitToPay.length,
+          canceled : canceled.length,
+          turnover : turnover,
+          percentage
+        };
+        statistics.push(status);
+      }
+      return res.json({
+        statistics,
+        totalEmployee: employee.length,
+        totalTurnOver,
+      });
+    }
+    else if (month && year) {
+      const documents = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+        ]}
+      }])
+      const totalTurnOver = documents.reduce((previousValue, currentValue) =>
+      previousValue + currentValue.bookingPrice,
+    0)
+      for (let i = 0; i < employee.length; i++) {
+        const totalBooking = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+          ]}
+        }])
+        const unConfimred = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 0]}},
+    
+          ]}
+        }])
+        const confirmed = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 1]}},
+    
+          ]}
+        }])
+        const canceled = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 2]}},
+    
+          ]}
+        }])
+        const waitToPay = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 3]}},
+    
+          ]}
+        }])
+        const finished = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},month]}},
+            {$expr:{$eq:["$employeeId" , employee[i]._id]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" , 4]}},
+    
+          ]}
+        }])
+        const turnover = finished.reduce(
+          (previousValue, currentValue) =>
+            previousValue + currentValue.bookingPrice,
+          0
+        );
+
+        const percentage = Number(turnover / totalTurnOver) * 100;
+        const status = {
+          employee: employee[i],
+          totalBooking : totalBooking.length,
+          unConfimred : unConfimred.length,
+          confirmed : confirmed.length,
+          finished : finished.length,
+          waitToPay : waitToPay.length,
+          canceled : canceled.length,
+          turnover : turnover,
+          percentage
         };
         statistics.push(status);
       }
@@ -235,10 +313,10 @@ export const employeeOrderStatistics = async (req, res) => {
 
 export const statisticsForOneEmployee = async (req, res) => {
   const id = req.params.id;
-  const {timeStart,timeEnd} = req.query
- 
+  const month = Number(req.query.month)
+  const year = Number(req.query.year)
   try {
-    if(!timeStart & !timeEnd){
+    if(!month & !year){
       const getTotal = await Booking.aggregate([
         { $match: { status: 4 } },
         { $group: { _id: null, sum: { $sum: "$bookingPrice" } } },
@@ -290,76 +368,69 @@ export const statisticsForOneEmployee = async (req, res) => {
         percentage,
       });
     }
-    else if(!timeStart && timeEnd || timeStart && !timeEnd){
-      return res.json({
-        message : "Vui lòng nhập cả thời gian bắt đầu và kết thúc" 
-      })
-    }
-    else if (timeStart && timeEnd){
-      const getTotal = await Booking.find({status: 4 , date: {
-        $gte: new Date(Number(timeStart) * 1000).toISOString(),
-        $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-      },}).exec()
-      const totalTurnOver = getTotal.reduce((previousValue, currentValue) =>
+    else if(!month && year ){
+      const documents = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+        ]}
+      }])
+      const totalTurnOver = documents.reduce((previousValue, currentValue) =>
       previousValue + currentValue.bookingPrice,
     0)
+   
       const information = await Employee.findOne({ _id: id }).exec();
-      const totalBooking = await Booking.countDocuments({
-        employeeId: id,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const unConfimred = await Booking.countDocuments({
-        employeeId: id,
-        status: 0,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const confirmed = await Booking.countDocuments({
-        employeeId: id,
-        status: 1,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const canceled = await Booking.countDocuments({
-        employeeId: id,
-        status: 2,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const waitToPay = await Booking.countDocuments({
-        employeeId: id,
-        status: 3,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const finished = await Booking.countDocuments({
-        employeeId: id,
-        status: 4,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const finishedBooking = await Booking.find({
-        employeeId: id,
-        status: 4,
-        date: {
-          $gte: new Date(Number(timeStart) * 1000).toISOString(),
-          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
-        }
-      }).exec();
-      const turnover = finishedBooking.reduce(
+      const totalBooking = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+        ]}
+      }])
+      console.log(totalBooking);
+      const unConfimred = await Booking.aggregate([{$match:
+        {$and : [
+         
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 0]}},
+  
+        ]}
+      }])
+      const confirmed = await Booking.aggregate([{$match:
+        {$and : [
+         
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 1]}},
+  
+        ]}
+      }])
+      const canceled = await Booking.aggregate([{$match:
+        {$and : [
+         
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 2]}},
+  
+        ]}
+      }])
+      const waitToPay = await Booking.aggregate([{$match:
+        {$and : [
+         
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 3]}},
+  
+        ]}
+      }])
+      const finished = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+        ]}
+      }])
+      const turnover = finished.reduce(
         (previousValue, currentValue) =>
           previousValue + currentValue.bookingPrice,
         0
@@ -367,14 +438,96 @@ export const statisticsForOneEmployee = async (req, res) => {
       const percentage = Number(turnover / totalTurnOver) * 100;
       res.json({
         information,
-        totalBooking,
-        unConfimred,
-        confirmed,
-        canceled,
-        waitToPay,
-        finished,
-        turnover,
-        percentage,
+        totalBooking : totalBooking.length,
+        unConfimred : unConfimred.length,
+        confirmed : confirmed.length,
+        finished : finished.length,
+        waitToPay : waitToPay.length,
+        canceled : canceled.length,
+        turnover : turnover,
+        percentage
+      });
+    }
+    else if (month && year){
+      const documents = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+        ]}
+      }])
+      const totalTurnOver = documents.reduce((previousValue, currentValue) =>
+      previousValue + currentValue.bookingPrice,
+    0)
+      const information = await Employee.findOne({ _id: id }).exec();
+      const totalBooking = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+          {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+        ]}
+      }])
+      const unConfimred = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 0]}},
+  
+        ]}
+      }])
+      const confirmed = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 1]}},
+  
+        ]}
+      }])
+      const canceled = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 2]}},
+  
+        ]}
+      }])
+      const waitToPay = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+         {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 3]}},
+  
+        ]}
+      }])
+      const finished = await Booking.aggregate([{$match:
+        {$and : [
+          {$expr:{$eq:[{$month:"$date"},month]}},
+          {$expr:{$eq:["$employeeId" ,{ $toObjectId: id }]}},
+          {$expr:{$eq:[{$year:"$date"},year]}},
+          {$expr:{$eq:["$status" , 4]}},
+  
+        ]}
+      }])
+      const turnover = finished.reduce(
+        (previousValue, currentValue) =>
+          previousValue + currentValue.bookingPrice,
+        0
+      );
+      const percentage = Number(turnover / totalTurnOver) * 100;
+      res.json({
+        information,
+        totalBooking : totalBooking.length,
+        unConfimred : unConfimred.length,
+        confirmed : confirmed.length,
+        finished : finished.length,
+        waitToPay : waitToPay.length,
+        canceled : canceled.length,
+        turnover : turnover,
+        percentage
       });
     }
   } catch (error) {
