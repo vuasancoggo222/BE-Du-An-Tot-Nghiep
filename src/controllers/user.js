@@ -79,3 +79,38 @@ export const userAccountStatistics = async (req,res) =>{
         return res.json(error.message)
     }
 }
+export const updateUserpassword = async (req,res) => {
+    let {currentPassword,newPassword,confirmPassword} = req.body
+    const {_id} = req.user
+    try {
+    const user = await User.findOne({_id}).exec()
+    const matchCurrentPassword = await bcrypt.compare(currentPassword,user.password)
+    if(matchCurrentPassword){
+        if(newPassword !== confirmPassword){
+            return res.status(400).json({
+                message : "Mật khẩu xác nhận không khớp."
+            })
+        }
+        else{
+            const saltRounds = 10;
+            newPassword = await bcrypt.hash(newPassword,saltRounds);
+            console.log(newPassword);
+            const update =  {
+                password : newPassword
+            }
+           await User.findOneAndUpdate({_id},update).exec()
+            return res.json({
+                message : "Cập nhật mật khẩu thành công."
+            })
+            }
+        }
+        else{
+            return res.status(400).json({
+                message : "Mật khẩu hiện tại không đúng."
+            })
+        }
+    }
+    catch (error) {
+        
+    }
+    } 
