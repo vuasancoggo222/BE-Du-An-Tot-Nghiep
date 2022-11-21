@@ -1,6 +1,8 @@
+import e from "cors";
 import { redis } from "googleapis/build/src/apis/redis";
 import Booking from "../models/booking";
 import Employee from "../models/employee";
+import User from "../models/user";
 export const list = async (req, res) => {
   try {
     const employees = await Employee.find({}).exec();
@@ -13,8 +15,27 @@ export const list = async (req, res) => {
 };
 export const create = async (req, res) => {
   try {
-    const employees = await new Employee(req.body).save();
-    res.json(employees);
+    const existUsers = await User.findOne({phoneNumber : req.body.phoneNumber}).exec()
+    if(existUsers){
+      return res.status(400).json({
+        message : "Số điện thoại đã được sử dụng"
+      })
+    }
+    else{
+      const employees = await new Employee(req.body).save();
+      const userData = {
+        name : employees.name,
+        phoneNumber : employees.phoneNumber,
+        gender : employees.gender,
+        role : 1,
+        permission : req.body.permission,
+        status : 1,
+        password : req.body.password,
+        employeeId : employees._id
+      }
+      await new User(userData).save()
+      return res.json(employees)
+    }
   } catch (error) {
     res.status(400).json({
       message: error.message,
