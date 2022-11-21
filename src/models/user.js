@@ -36,6 +36,14 @@ role : {
     type : Number,
     default : 0,
 },
+permission :  {
+    type : Array,
+},
+employeeId : {
+    type : ObjectId,
+    ref : "Employee"
+    //Nếu là tk nhân viên,
+},
 status : {
     type : Number,
     default : 0    
