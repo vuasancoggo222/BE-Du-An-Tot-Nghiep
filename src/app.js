@@ -58,9 +58,8 @@ app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
 
-let socketEmitList = false
+let socketEmitList = false;
 io.use((socket, next) => {
- 
   if (socket.handshake.query.token) {
     jwt.verify(socket.handshake.query.token, "datn", function (err, decoded) {
       if (err) return next(new Error("Authentication error"));
@@ -74,25 +73,23 @@ io.use((socket, next) => {
 }).on("connection", async (socket) => {
   socket.on("newUser", async (id) => {
     addNewUser(id, socket.id, socket.role);
-   ;
-  
     const receive = getUser(id);
     console.log(onlineUsers);
     const receiverByRole = getUserByRole(2);
-    if(!socketEmitList &&  receiverByRole){
-    const listNotification = await getListAdminNotification();
-    io.to(receiverByRole.socketId).emit("notification", listNotification);
-    socketEmitList = true
+    if (!socketEmitList && receiverByRole) {
+      const listNotification = await getListAdminNotification();
+      io.to(receiverByRole.socketId).emit("notification", listNotification);
+      socketEmitList = true;
     }
 
-    if(receive){
+    if (receive) {
       const userListNotification = await getUserListNotification(id);
-    io.to(receive["socketId"]).emit(
-      "userListNotification",
-      userListNotification
-    );
+      io.to(receive["socketId"]).emit(
+        "userListNotification",
+        userListNotification
+      );
     }
-  });
+  })
   socket.on("newNotification", async (data) => {
     const notification = {
       bookingId: data.id,
@@ -104,35 +101,35 @@ io.use((socket, next) => {
       bookingId: data.id,
     }).exec();
     const receiverByRole = getUserByRole(2);
-    if(receiverByRole){
+    if (receiverByRole) {
       io.to(receiverByRole.socketId).emit("newNotification", sendNotification);
       const listNotification = await getListAdminNotification();
       io.to(receiverByRole.socketId).emit("notification", listNotification);
     }
   });
-  socket.on("newUserNotification", async (data) =>{;
+  socket.on("newUserNotification", async (data) => {
     const notification = {
       bookingId: data.id,
+      from : data.from,
       notificationType: data.type,
       text: data.text,
-      userId : data.userId
+      userId: data.userId,
     };
     await newNotification(notification);
-    const sendNotification = await Notification.findOne({
-      bookingId: data.id,
-    }).exec();
-    console.log(sendNotification);
-    const receive = getUser(data.id)
-    console.log(receive);
-    if(receive){
-      const userListNotification = await getUserListNotification(id);
+    const sendNotification = await Notification.findOne({bookingId: data.id}).exec();
+    console.log(data.userId);
+    const receiver = getUser(data.userId);
+    console.log(receiver);
+    if (receiver) {
+      io.to(receiver.socketId).emit('myNewNotification',sendNotification)
+      const userListNotification = await getUserListNotification(receiver.id);
       console.log(userListNotification);
-      io.to(receive["socketId"]).emit(
-      "userListNotification",
-      userListNotification
+      io.to(receiver.socketId).emit(
+        "userListNotification",
+        userListNotification
       );
     }
-  })
+  });
   socket.on("disconnect", (reason) => {
     removeUser(socket.id);
   });
