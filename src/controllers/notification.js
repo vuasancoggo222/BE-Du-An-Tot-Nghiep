@@ -17,10 +17,10 @@ export const newNotification = async (data) => {
     }
 }
 
-export const getUserListNotification = async (id) => {
+export const getUserListNotification = async (userId) => {
     try {
-        const listNotification = await Notification.find({userId : id}).sort({createdAt: -1}).exec()
-        return listNotification
+        const userListNotification = await Notification.find({userId}).sort({createdAt: -1}).exec()
+        return userListNotification
     } catch (error) {
         return error
     }

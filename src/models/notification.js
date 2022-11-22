@@ -12,6 +12,10 @@ notificationType : {
 text : {
     type : String
 },
+from : {
+    type : ObjectId,
+    ref: 'Users'
+},
 userId : {
     type : ObjectId,
     ref : 'Users'
