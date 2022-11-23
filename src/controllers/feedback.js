@@ -26,7 +26,6 @@ export const listFeedBackByService = async (req, res) => {
       },
     ]);
     const rating = calculateRating.find((item) => item._id == req.params.svid);
-
     for (let i = 1; i < 6; i++) {
       const countDocuments = await Feedback.countDocuments({
         service: req.params.svid,
@@ -45,7 +44,7 @@ export const listFeedBackByService = async (req, res) => {
         .exec();
       return res.json({
         listFeedback,
-        ratingAvg: rating.ratingAvg,
+        ratingAvg:  rating.ratingAvg,
         starsByLevel,
       });
     }
@@ -57,7 +56,7 @@ export const listFeedBackByService = async (req, res) => {
 
     return res.json({
       listFeedback,
-      ratingAvg: rating.ratingAvg,
+      ratingAvg: rating ? rating.ratingAvg : 0,
       starsByLevel,
     });
   } catch (error) {
