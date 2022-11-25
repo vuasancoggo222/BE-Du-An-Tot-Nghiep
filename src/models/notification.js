@@ -19,6 +19,10 @@ from : {
 userId : {
     type : ObjectId,
     ref : 'Users'
+},
+readed: {
+    type : Boolean,
+    default : false
 }
 },{timestamps: true})
 

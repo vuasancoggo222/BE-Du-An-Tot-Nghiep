@@ -57,7 +57,6 @@ app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
-
 let socketEmitList = false;
 io.use((socket, next) => {
   if (socket.handshake.query.token) {
@@ -74,7 +73,6 @@ io.use((socket, next) => {
   socket.on("newUser", async (id) => {
     addNewUser(id, socket.id, socket.role);
     const receive = getUser(id);
-    console.log(onlineUsers);
     const receiverByRole = getUserByRole(2);
     if (!socketEmitList && receiverByRole) {
       const listNotification = await getListAdminNotification();
@@ -117,7 +115,6 @@ io.use((socket, next) => {
     };
     await newNotification(notification);
     const sendNotification = await Notification.findOne({bookingId: data.id}).exec();
-    console.log(data.userId);
     const receiver = getUser(data.userId);
     console.log(receiver);
     if (receiver) {
