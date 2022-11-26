@@ -17,6 +17,7 @@ import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
 import blogRouter from "./routes/blog";
+import notìicationRouter from './routes/notification'
 import http from "http";
 import { Server } from "socket.io";
 import { initializeApp } from "firebase-admin/app";
@@ -57,6 +58,7 @@ app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
+app.use("/api",notìicationRouter)
 let socketEmitList = false;
 io.use((socket, next) => {
   if (socket.handshake.query.token) {
@@ -72,21 +74,6 @@ io.use((socket, next) => {
 }).on("connection", async (socket) => {
   socket.on("newUser", async (id) => {
     addNewUser(id, socket.id, socket.role);
-    const receive = getUser(id);
-    const receiverByRole = getUserByRole(2);
-    if (!socketEmitList && receiverByRole) {
-      const listNotification = await getListAdminNotification();
-      io.to(receiverByRole.socketId).emit("notification", listNotification);
-      socketEmitList = true;
-    }
-
-    if (receive) {
-      const userListNotification = await getUserListNotification(id);
-      io.to(receive["socketId"]).emit(
-        "userListNotification",
-        userListNotification
-      );
-    }
   })
   socket.on("newNotification", async (data) => {
     const notification = {
@@ -101,8 +88,6 @@ io.use((socket, next) => {
     const receiverByRole = getUserByRole(2);
     if (receiverByRole) {
       io.to(receiverByRole.socketId).emit("newNotification", sendNotification);
-      const listNotification = await getListAdminNotification();
-      io.to(receiverByRole.socketId).emit("notification", listNotification);
     }
   });
   socket.on("newUserNotification", async (data) => {
@@ -116,15 +101,8 @@ io.use((socket, next) => {
     await newNotification(notification);
     const sendNotification = await Notification.findOne({bookingId: data.id}).exec();
     const receiver = getUser(data.userId);
-    console.log(receiver);
     if (receiver) {
       io.to(receiver.socketId).emit('myNewNotification',sendNotification)
-      const userListNotification = await getUserListNotification(receiver.id);
-      console.log(userListNotification);
-      io.to(receiver.socketId).emit(
-        "userListNotification",
-        userListNotification
-      );
     }
   });
   socket.on("disconnect", (reason) => {
