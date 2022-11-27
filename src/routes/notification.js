@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getListAdminNotification,
   getUserListNotification,
+readNotification,
 } from "../controllers/notification";
 import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 import { isAdmin } from "../middlewares/checkRole";
