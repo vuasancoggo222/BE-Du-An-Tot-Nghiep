@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 
-const bannerSchema = new mongoose.Schema({
+const bannerSchema = new mongoose.Schema(
+  {
     image: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-    }
-
-}, {
-    timestamps: true
-});
-
-export default mongoose.model("banner", bannerSchema)
+export default mongoose.model("banner", bannerSchema);
