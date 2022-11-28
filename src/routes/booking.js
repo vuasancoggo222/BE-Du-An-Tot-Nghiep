@@ -9,7 +9,9 @@ import {
   userBookingList,
   employeeBookingList2,
 } from "../controllers/booking";
+import { isEmployee } from "../middlewares/checkRole";
 import { firebaseVerifyIdToken } from "../middlewares/firebaseVerifyIdToken";
+import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 const router = Router();
 router.post("/booking", firebaseVerifyIdToken, createBooking);
 router.get("/booking", listBooking);
