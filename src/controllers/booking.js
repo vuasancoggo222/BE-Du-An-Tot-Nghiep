@@ -106,9 +106,9 @@ export const employeeBookingList = async (req, res) => {
 };
 
 export const bookingGenderStatistics = async (req, res) => {
-  const { svid ,timeStart,timeEnd} = req.query;
+  const { svid, timeStart, timeEnd } = req.query;
   try {
-    if (svid && !timeStart || !timeEnd){
+    if ((svid && !timeStart) || !timeEnd) {
       const male = await Booking.countDocuments({
         gender: "male",
         status: 4,
@@ -124,27 +124,38 @@ export const bookingGenderStatistics = async (req, res) => {
       const male = await Booking.countDocuments({
         gender: "male",
         status: 4,
-        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+        date: {
+          $gte: new Date(Number(timeStart) * 1000).toISOString(),
+          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
+        },
       }).exec();
       const female = await Booking.countDocuments({
         gender: "female",
         status: 4,
-        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+        date: {
+          $gte: new Date(Number(timeStart) * 1000).toISOString(),
+          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
+        },
       }).exec();
       return res.json({ male, female });
-    }
-    else if(timeStart && timeEnd && svid){
+    } else if (timeStart && timeEnd && svid) {
       const male = await Booking.countDocuments({
         gender: "male",
         status: 4,
         serviceId: { $in: [svid] },
-        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+        date: {
+          $gte: new Date(Number(timeStart) * 1000).toISOString(),
+          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
+        },
       }).exec();
       const female = await Booking.countDocuments({
         gender: "female",
         status: 4,
         serviceId: { $in: [svid] },
-        date: { $gte: new Date(Number(timeStart)*1000).toISOString(), $lte: new Date(Number(timeEnd)*1000).toISOString() }
+        date: {
+          $gte: new Date(Number(timeStart) * 1000).toISOString(),
+          $lte: new Date(Number(timeEnd) * 1000).toISOString(),
+        },
       }).exec();
       return res.json({ male, female });
     } else {
@@ -160,5 +171,19 @@ export const bookingGenderStatistics = async (req, res) => {
     }
   } catch (error) {
     res.status(400).json(error.message);
+  }
+};
+
+export const employeeBookingList2 = async (req, res) => {
+  console.log(req.user);
+  try {
+    const listBooking = await Booking.find({
+      employeeId: req.user.employeeId,
+    }).exec();
+    return res.json(listBooking);
+  } catch (error) {
+    return res.status(400).json({
+      message: error.message,
+    });
   }
 };
