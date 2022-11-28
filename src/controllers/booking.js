@@ -10,7 +10,7 @@ export const createBooking = async (req, res) => {
       userId: req.query.user,
       phoneNumber: req.body.phoneNumber,
       note: req.body.note,
-      serviceId: req.body.serviceId,
+      services: req.body.services,
       employeeId: req.body.employeeId,
       date: req.body.date,
       time: req.body.time,

@@ -37,11 +37,16 @@ const bookingSchema = new Schema(
       type: ObjectId,
       ref: "Employee",
     },
-    serviceId: [
-      {
+    services: [
+     {
+      serviceId : {
         type : ObjectId,
-        ref : "Service"
+        ref: "Service"
+      },
+      price : {
+        type : Number
       }
+     }
     ],
     gender:{
       type : String,

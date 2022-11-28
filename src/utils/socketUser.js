@@ -13,6 +13,10 @@ export const removeUser = (socketId) => {
   onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
 }
 
-export const getUserByRole = (role) => {
-  return onlineUsers.find(user => user.socketRole === role)
+export const getAdmin = () => {
+  return onlineUsers.find(user => user.socketRole === 2)
+}
+
+export const getEmployee = (id) =>{
+  return onlineUsers.find(user => user.id === id && user.socketRole == 1)
 }

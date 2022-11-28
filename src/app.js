@@ -7,7 +7,8 @@ import {
   onlineUsers,
   getUser,
   removeUser,
-  getUserByRole,
+  getAdmin,
+  getEmployee
 } from "./utils/socketUser";
 import "dotenv/config";
 import Notification from "./models/notification";
@@ -59,42 +60,53 @@ app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
 app.use("/api",notìicationRouter)
-let socketEmitList = false;
-io.use((socket, next) => {
-  if (socket.handshake.query.token) {
-    jwt.verify(socket.handshake.query.token, "datn", function (err, decoded) {
-      if (err) return next(new Error("Authentication error"));
-      socket.decoded = decoded;
-      socket.role = decoded.role;
-      next();
-    });
-  } else {
-    next(new Error("Authentication error"));
-  }
-}).on("connection", async (socket) => {
-  socket.on("newUser", async (id) => {
-    addNewUser(id, socket.id, socket.role);
+io.on("connection", async (socket) => {
+ 
+  socket.on("newUser", (token) => {
+    if (token) {
+      jwt.verify(token, "datn", async (err, decoded) =>{
+        if (err) return (new Error("Authentication error"));
+        const role = decoded.role;
+        const id = decoded._id
+        addNewUser(id, socket.id,role);
+        const user = getUser(id)
+        const admin = getAdmin()
+        const employee = getEmployee()
+        if(user){
+          const userList = await getUserListNotification(id)
+          io.to(user.socketId).emit('userListNotification',userList)
+        }
+        if(admin){
+          const adminList = await getListAdminNotification()
+          io.to(admin.socketId).emit('notification',adminList)
+        }
+      });
+    } else {
+      (new Error("Authentication error"));
+    }
   })
   socket.on("newNotification", async (data) => {
     const notification = {
       bookingId: data.id,
-      notificationType: data.type,
+      notificationType: data.type || 'booking',
       text: data.text,
     };
     await newNotification(notification);
     const sendNotification = await Notification.findOne({
       bookingId: data.id,
     }).exec();
-    const receiverByRole = getUserByRole(2);
-    if (receiverByRole) {
-      io.to(receiverByRole.socketId).emit("newNotification", sendNotification);
+    const admin = getAdmin();
+    if (admin) {
+      io.to(admin.socketId).emit("newNotification", sendNotification);
+      const adminList = await getListAdminNotification()
+      io.to(admin.socketId).emit('notification',adminList)
     }
   });
   socket.on("newUserNotification", async (data) => {
     const notification = {
       bookingId: data.id,
       from : data.from,
-      notificationType: data.type,
+      notificationType: 'user',
       text: data.text,
       userId: data.userId,
     };
@@ -103,6 +115,8 @@ io.use((socket, next) => {
     const receiver = getUser(data.userId);
     if (receiver) {
       io.to(receiver.socketId).emit('myNewNotification',sendNotification)
+      const userList = await getUserListNotification(data.userId)
+      io.to(user.socketId).emit('userListNotification',userList)
     }
   });
   socket.on("disconnect", (reason) => {

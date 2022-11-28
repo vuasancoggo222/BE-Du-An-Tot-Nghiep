@@ -1,18 +1,18 @@
 import Notification from "../models/notification";
 
-export const getListAdminNotification = async (req, res) => {
+export const getListAdminNotification = async () => {
   try {
-    const listNotification = await Notification.find({})
+    const listNotification = await Notification.find({notificationType : 'admin'})
       .populate("bookingId")
       .sort({ createdAt: -1 })
       .exec();
-    const unRead = await Notification.countDocuments({ readed: false }).exec();
-    res.json({
+    const unRead = await Notification.countDocuments({ readed: false, notificationType : 'admin' }).exec();
+     return {
       notfication: listNotification,
       unRead,
-    });
+    };
   } catch (error) {
-    res.status(400).json(error.message);
+    return error
   }
 };
 
@@ -25,23 +25,16 @@ export const newNotification = async (data) => {
   }
 };
 
-export const getUserListNotification = async (req, res) => {
+export const getUserListNotification = async (userId) => {
   try {
-    const userListNotification = await Notification.find({
-      userId: req.user._id,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-    const unRead = await Notification.countDocuments({
-      readed: false,
-      userId: req.user._id,
-    }).exec();
-    res.json({
+    const userListNotification = await Notification.find({userId}).sort({ createdAt: -1 }).exec();
+    const unRead = userListNotification.filter(item => item.userId == userId && item.readed == false)
+    return {
       notification: userListNotification,
-      unRead,
-    });
+      unRead : unRead.length,
+    }
   } catch (error) {
-    res.status(400).json(error.message);
+    return error
   }
 };
 
