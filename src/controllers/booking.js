@@ -30,7 +30,7 @@ export const listBooking = async (req, res) => {
     const booking = await Booking.find({})
       .sort({ createdAt: -1 })
       .populate({ path: "userId", select: "-password" })
-      .populate("services")
+      .populate("services.serviceId")
       .populate({ path: "employeeId", select: "-idCard" })
 
       .exec();
