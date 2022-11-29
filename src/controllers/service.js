@@ -78,7 +78,7 @@ export const readslug = async (req, res) => {
     });
   }
 };
-
+ //Done xxxxxx
 export const groupAgeByService = async (req, res) => {
   try {
     const serviceId = await Service.distinct("_id");
@@ -87,32 +87,32 @@ export const groupAgeByService = async (req, res) => {
       const service = await Service.findOne({ _id: svid }).exec();
       const group1 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+        "services.serviceId": svid,
         age: { $gte: 0, $lte: 16 },
       });
       const group2 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         age: { $gte: 17, $lte: 24 },
       });
       const group3 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         age: { $gte: 25, $lte: 34 },
       });
       const group4 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         age: { $gte: 35, $lte: 45 },
       });
       const group5 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         age: { $gte: 46, $lte: 60 },
       });
       const group6 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         age: { $gt: 60 },
       });
 
@@ -129,7 +129,7 @@ export const groupAgeByService = async (req, res) => {
     return res.status(400).json(error.message);
   }
 };
-
+//Done
 export const groupGenderByService = async (req, res) => {
   try {
     const serviceId = await Service.distinct("_id");
@@ -138,12 +138,12 @@ export const groupGenderByService = async (req, res) => {
       const service = await Service.findOne({ _id: svid }).exec();
       const group1 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         gender: 0,
       });
       const group2 = await Booking.countDocuments({
         status: 4,
-        serviceId: { $in: [svid] },
+       "services.serviceId": svid,
         gender: 1,
       });
 
@@ -160,7 +160,7 @@ export const groupGenderByService = async (req, res) => {
     return res.status(400).json(error.message);
   }
 };
-
+//Done
 export const servicesStatistic = async (req, res) => {
   const month = Number(req.query.month)
   const year = Number(req.query.year)
@@ -169,18 +169,25 @@ export const servicesStatistic = async (req, res) => {
     let services = [];
     let total = 0;
     if (!month && !year) {
-     
+      
       for (let svid of serviceId) {
         const service = await Service.findOne({ _id: svid }).exec();
-        const numberOfService = await Booking.countDocuments({
-          serviceId: { $in: [svid] },
-          status: 4,
-        }).exec();
-        total += Number(numberOfService * service.price);
+        const documents = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:["$status" , 4]}},
+            {"services.serviceId" :svid}
+          ]}
+        }])
+        let servicesPrices = 0
+        for(let i = 0 ; i < documents.length; i++){
+          const servicePrice = documents[i].services.find(item => item.serviceId == svid.toString())
+          servicesPrices += servicePrice.price
+        }
+        total += servicesPrices
         const serviceElement = {
           service,
-          complete: numberOfService,
-          turnover: Number(numberOfService * service.price),
+          complete: documents.length,
+          turnover : servicesPrices
         };
         services.push(serviceElement);
       }
@@ -200,14 +207,20 @@ export const servicesStatistic = async (req, res) => {
             {$expr:{$eq:[{$month:"$date"},month]}},
             {$expr:{$eq:[{$year:"$date"},year]}},
             {$expr:{$eq:["$status" , 4]}},
-            {serviceId:{$in:[svid]}}
+            {"services.serviceId" :svid}
+           
           ]}
         }])
-        total += Number(documents.length * service.price);
+        let servicesPrices = 0
+        for(let i = 0 ; i < documents.length; i++){
+          const servicePrice = documents[i].services.find(item => item.serviceId == svid.toString())
+          servicesPrices += servicePrice.price
+        }
+        total += servicesPrices
         const serviceElement = {
           service,
           complete: documents.length,
-          turnover: Number(documents.length * service.price),
+          turnover: servicesPrices,
         };
         services.push(serviceElement);
       }
@@ -224,15 +237,20 @@ export const servicesStatistic = async (req, res) => {
           {$and : [
             {$expr:{$eq:[{$year:"$date"},year]}},
             {$expr:{$eq:["$status" , 4]}},
-            {serviceId:{$in:[svid]}}
+            {"services.serviceId" :svid}
           ]}
         }
         ])
-        total += Number(documents.length * service.price);
+        let servicesPrices = 0
+        for(let i = 0 ; i < documents.length; i++){
+          const servicePrice = documents[i].services.find(item => item.serviceId == svid.toString())
+          servicesPrices += servicePrice.price
+        }
+        total += servicesPrices
         const serviceElement = {
           service,
           complete: documents.length,
-          turnover: Number(documents.length * service.price),
+          turnover: servicesPrices,
         };
         services.push(serviceElement);
       }
@@ -260,12 +278,14 @@ export const turnoverServicesMonth = async (req,res) => {
             {$expr:{$eq:[{$month:"$date"},i]}},
             {$expr:{$eq:[{$year:"$date"},year]}},
             {$expr:{$eq:["$status" , 4]}},
-            {serviceId:{$in:[svid]}}
+            {"services.serviceId" :svid}
           ]}
         }])
-        
-        // console.log(i,documents.length);
-        const turnoverMonth = Number(service.price * documents.length)
+        let turnoverMonth  = 0
+        for(let i = 0 ; i < documents.length; i++){
+          const servicePrice = documents[i].services.find(item => item.serviceId == svid.toString())
+          turnoverMonth += servicePrice.price
+        }
         
         datas.push(turnoverMonth)
       }
@@ -279,6 +299,6 @@ export const turnoverServicesMonth = async (req,res) => {
       totalServices : serviceId.length
     })
   } catch (error) {
-    
+    return res.status(400).json(error.message)
   }
 }
