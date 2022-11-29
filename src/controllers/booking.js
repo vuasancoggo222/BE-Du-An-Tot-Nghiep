@@ -30,7 +30,7 @@ export const listBooking = async (req, res) => {
     const booking = await Booking.find({})
       .sort({ createdAt: -1 })
       .populate({ path: "userId", select: "-password" })
-      .populate("serviceId")
+      .populate("services")
       .populate({ path: "employeeId", select: "-idCard" })
 
       .exec();
@@ -62,7 +62,7 @@ export const updateStatus = async (req, res) => {
       ).exec();
       await User.findOneAndUpdate(
         { _id: booking.userId },
-        { $push: { serviceUsed: booking.serviceId } }
+        { $push: { serviceUsed: booking.services } }
       );
       return res.json(booking);
     } else {
@@ -82,7 +82,7 @@ export const updateStatus = async (req, res) => {
 export const userBookingList = async (req, res) => {
   try {
     const listBooking = await Booking.find({ userId: req.params.id })
-      .populate("serviceId")
+      .populate("services")
       .exec();
     return res.json(listBooking);
   } catch (error) {
@@ -112,12 +112,12 @@ export const bookingGenderStatistics = async (req, res) => {
       const male = await Booking.countDocuments({
         gender: "male",
         status: 4,
-        serviceId: { $in: [svid] },
+        services: { $in: [svid] },
       }).exec();
       const female = await Booking.countDocuments({
         gender: "female",
         status: 4,
-        serviceId: { $in: [svid] },
+        services: { $in: [svid] },
       }).exec();
       return res.json({ male, female });
     } else if (timeStart && timeEnd && !svid) {
@@ -142,7 +142,7 @@ export const bookingGenderStatistics = async (req, res) => {
       const male = await Booking.countDocuments({
         gender: "male",
         status: 4,
-        serviceId: { $in: [svid] },
+        services: { $in: [svid] },
         date: {
           $gte: new Date(Number(timeStart) * 1000).toISOString(),
           $lte: new Date(Number(timeEnd) * 1000).toISOString(),
@@ -151,7 +151,7 @@ export const bookingGenderStatistics = async (req, res) => {
       const female = await Booking.countDocuments({
         gender: "female",
         status: 4,
-        serviceId: { $in: [svid] },
+        services: { $in: [svid] },
         date: {
           $gte: new Date(Number(timeStart) * 1000).toISOString(),
           $lte: new Date(Number(timeEnd) * 1000).toISOString(),
