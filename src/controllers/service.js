@@ -1,7 +1,7 @@
 import Service from "../models/service";
-
 import slugify from "slugify";
 import Booking from "../models/booking";
+
 export const createService = async (req, res) => {
   req.body.slug = slugify(req.body.name);
   try {
@@ -21,7 +21,7 @@ export const list = async (req, res) => {
       const ListServices = await Service.find({ status: 0 });
       return res.json(ListServices);
     }
-    const ListServices = await Service.find();
+    const ListServices = await Service.find({}).exec();
     return res.json(ListServices);
   } catch (error) {
     res.status(400).json({
@@ -36,7 +36,7 @@ export const update = async (req, res) => {
       req.params.id,
       req.body,
       { new: true }
-    );
+    ).exec()
     res.json(UpdateService);
   } catch (error) {
     res.status(400).json({
@@ -47,7 +47,7 @@ export const update = async (req, res) => {
 // delete service
 export const remove = async (req, res) => {
   try {
-    const removeService = await Service.findByIdAndDelete(req.params.id);
+    const removeService = await Service.findByIdAndDelete(req.params.id).exec();
     res.json(removeService);
   } catch (error) {
     res.status(400).json({
@@ -58,7 +58,7 @@ export const remove = async (req, res) => {
 // readID service
 export const read = async (req, res) => {
   try {
-    const serviceId = await Service.findById(req.params.id);
+    const serviceId = await Service.findById(req.params.id).exec();
     console.log(req.params.id);
     res.json(serviceId);
   } catch (error) {
@@ -69,7 +69,7 @@ export const read = async (req, res) => {
 };
 export const readslug = async (req, res) => {
   try {
-    const serviceId = await Service.findOne({ slug: req.params.slug });
+    const serviceId = await Service.findOne({ slug: req.params.slug }).exec();
     console.log(req.params.id);
     res.json(serviceId);
   } catch (error) {

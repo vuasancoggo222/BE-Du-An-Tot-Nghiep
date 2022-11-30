@@ -1,6 +1,4 @@
-import e from "cors";
-import { redis } from "googleapis/build/src/apis/redis";
-import { finished } from "nodemailer/lib/xoauth2";
+
 import Booking from "../models/booking";
 import Employee from "../models/employee";
 import User from "../models/user";
@@ -407,7 +405,7 @@ export const statisticsForOneEmployee = async (req, res) => {
           {$expr:{$eq:[{$year:"$date"},year]}},
         ]}
       }])
-      console.log(totalBooking);
+    
       const unConfimred = await Booking.aggregate([{$match:
         {$and : [
          

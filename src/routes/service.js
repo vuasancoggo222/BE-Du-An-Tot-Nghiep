@@ -4,7 +4,6 @@ import {
   list,
   read,
   remove,
-  unactiveService,
   update,
   readslug,
   groupAgeByService,

@@ -65,7 +65,7 @@ io.on("connection", async (socket) => {
   socket.on("newUser", (token) => {
     if (token) {
       jwt.verify(token, "datn", async (err, decoded) =>{
-        if (err) return (new Error("Authentication error"));
+        if (err) return new Error("Authentication error");
         const role = decoded.role;
         const id = decoded._id
         addNewUser(id, socket.id,role);
@@ -82,7 +82,7 @@ io.on("connection", async (socket) => {
         }
       });
     } else {
-      (new Error("Authentication error"));
+      return (new Error("Authentication error"));
     }
   })
   socket.on("newNotification", async (data) => {
@@ -128,6 +128,6 @@ httpServer.listen(process.env.PORT, () => {
 });
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGODB_URL || 5000)
   .then(() => console.log("Connect DB Successfully"))
   .catch((error) => console.log(error));
