@@ -14,7 +14,7 @@ export const jwtVerifyToken = async (req,res,next) =>{
         if(err){
             return res.status(401).json(err)
         }
-        req.user = decoded
+        req.user = decoded;
         console.log(req.user);
         next()
        })
