@@ -1,15 +1,26 @@
-import {Router} from 'express'
-import { getOneUser, getUserProfile, listUser, updateProfile, updateUser, updateUserpassword, userAccountStatistics } from '../controllers/user'
-import { isAdmin } from '../middlewares/checkRole'
-import { jwtVerifyToken } from '../middlewares/jwtVerifyToken'
+import { Router } from "express";
+import {
+  getOneUser,
+  getUserProfile,
+  listUser,
+  resetPassword,
+  updateProfile,
+  updateUser,
+  updateUserpassword,
+  userAccountStatistics,
+} from "../controllers/user";
+import { isAdmin } from "../middlewares/checkRole";
+import { firebaseVerifyIdToken } from "../middlewares/firebaseVerifyIdToken";
+import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 
-const router = new Router()
+const router = new Router();
 
-router.get('/users',listUser)
-router.put('/user/my-profile/edit',jwtVerifyToken,updateProfile)
-router.get('/user/my-profile',jwtVerifyToken,getUserProfile)
-router.get('/user/:id',jwtVerifyToken,isAdmin,getOneUser)
-router.put('/user/edit/:id',jwtVerifyToken,isAdmin,updateUser)
-router.get('/users/acccount-status-statistics',userAccountStatistics)
-router.put('/update-password',jwtVerifyToken,updateUserpassword)
-export default router
+router.get("/users", listUser);
+router.put("/user/my-profile/edit", jwtVerifyToken, updateProfile);
+router.get("/user/my-profile", jwtVerifyToken, getUserProfile);
+router.get("/user/:id", jwtVerifyToken, isAdmin, getOneUser);
+router.put("/user/edit/:id", jwtVerifyToken, isAdmin, updateUser);
+router.get("/users/acccount-status-statistics", userAccountStatistics);
+router.put("/update-password", jwtVerifyToken, updateUserpassword);
+router.put("reset-password", firebaseVerifyIdToken, resetPassword);
+export default router;
