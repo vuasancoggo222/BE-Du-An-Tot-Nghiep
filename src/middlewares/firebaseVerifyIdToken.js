@@ -11,6 +11,7 @@ export const firebaseVerifyIdToken = async (req,res,next) =>{
        try {
         const decodedToken = await getAuth().verifyIdToken(tokenHeaders[0])
         const uid = decodedToken.uid;
+        req.user = decodedToken;
         next()
        } catch (error) {
             return res.status(400).json({

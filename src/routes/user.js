@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+checkPhoneNumberValid,
   getOneUser,
   getUserProfile,
   listUser,
@@ -22,5 +23,6 @@ router.get("/user/:id", jwtVerifyToken, isAdmin, getOneUser);
 router.put("/user/edit/:id", jwtVerifyToken, isAdmin, updateUser);
 router.get("/users/acccount-status-statistics", userAccountStatistics);
 router.put("/update-password", jwtVerifyToken, updateUserpassword);
-router.put("reset-password", firebaseVerifyIdToken, resetPassword);
+router.put("/reset-password", firebaseVerifyIdToken, resetPassword);
+router.post('/check-valid-phone-number',checkPhoneNumberValid)
 export default router;

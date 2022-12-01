@@ -132,16 +132,17 @@ export const updateUserpassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { newPassword, confirmPassword } = req.body;
+  const { password, confirmPassword } = req.body;
+  console.log(req.user);
   const phoneNumber = req.user.phone_number.replace("+84", 0);
   try {
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       return res.status(400).json({
         message: "Mật khẩu xác nhận không khớp.",
       });
     } else {
       const saltRounds = 10;
-      const hashPassword = await bcrypt.hash(newPassword, saltRounds);
+      const hashPassword = await bcrypt.hash(password, saltRounds);
       const update = {
         password: hashPassword,
       };
@@ -156,3 +157,23 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
+export const checkPhoneNumberValid  = async (req,res) => {
+  try {
+    const isValid = await User.findOne({phoneNumber : req.body.phoneNumber}).exec()
+    if(isValid){
+      return res.json({
+        message : "Xác nhận tài khoản của bạn."
+      })
+    }
+    else{
+      return res.status(400).json({
+        message : 'Không tìm thấy tài khoản.'
+      })
+    }
+  } catch (error) {
+    return res.json(
+      error.message
+    )
+  }
+}
