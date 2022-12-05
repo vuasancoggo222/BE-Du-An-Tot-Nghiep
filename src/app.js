@@ -18,7 +18,8 @@ import bookingRouter from "./routes/booking";
 import contactRouter from "./routes/contact";
 import employeeRouter from "./routes/employee";
 import blogRouter from "./routes/blog";
-import notìicationRouter from './routes/notification'
+import noticationRouter from './routes/notification'
+import voucherRouter from './routes/voucher'
 import http from "http";
 import { Server } from "socket.io";
 import { initializeApp } from "firebase-admin/app";
@@ -59,7 +60,8 @@ app.use("/api", employeeRouter);
 app.use("/api", feedbackRouter);
 app.use("/api", BannerRouter);
 app.use("/api", blogRouter);
-app.use("/api",notìicationRouter)
+app.use("/api",noticationRouter)
+app.use('/api',voucherRouter)
 io.on("connection", async (socket) => {
  
   socket.on("newUser", (token) => {
