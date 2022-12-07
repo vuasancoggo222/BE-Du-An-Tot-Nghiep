@@ -25,10 +25,20 @@ const voucherSchema = new Schema(
         type:Number,
         required:true
     },
+    type : {
+      type : String,
+    },
     expirationDate:{
         type : Date,
         required :true
-    }
+    },
+    userUsed : {
+      type : Array
+    },
+    description:{
+      type : String,
+      minLength : 30
+    },
   },
   {
     timestamps: true,
