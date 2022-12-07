@@ -54,6 +54,10 @@ const bookingSchema = new Schema(
     bookingPrice : {
       type : Number
     },
+    voucher : {
+      type : ObjectId,
+      ref : 'Voucher'
+    }
   },
   { timestamps: true }
 );
