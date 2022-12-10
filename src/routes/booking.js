@@ -20,7 +20,7 @@ router.get("/booking/:id", read);
 router.patch("/booking/:id", updateStatus);
 router.get("/booking-history/:id", userBookingList);
 router.get("/booking-employee-list/:id", employeeBookingList);
-router.get("/booking-gender-statistics/", bookingGenderStatistics);
+router.get("/booking-gender-statistics", bookingGenderStatistics);
 router.get(
   "/booking-employee",
   jwtVerifyToken,

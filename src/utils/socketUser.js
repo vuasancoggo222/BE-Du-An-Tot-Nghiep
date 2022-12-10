@@ -6,7 +6,7 @@ export const addNewUser = (id, socketId,socketRole) => {
   };
 
 export const getUser = (id) => {
-    return onlineUsers.find((user) => user.id === id && user.socketRole == 0);
+    return onlineUsers.find((user) => user.id == id && user.socketRole == 0);
   };
 
 export const removeUser = (socketId) => {

@@ -95,7 +95,10 @@ export const employeeOrderStatistics = async (req, res) => {
         { $match: { status: 4 } },
         { $group: { _id: null, sum: { $sum: "$bookingPrice" } } },
       ]);
-      const totalTurnOver = getTotal[0].sum;
+      let totalTurnOver  = 0
+      if(getTotal.length){
+        totalTurnOver = getTotal[0].sum;
+      }
       for (let i = 0; i < employee.length; i++) {
         const finishedBooking = await Booking.find({
           employeeId: employee[i]._id,
@@ -151,7 +154,6 @@ export const employeeOrderStatistics = async (req, res) => {
       });
     }
     else if(year && !month){
-      
       const documents = await Booking.aggregate([{$match:
         {$and : [
           {$expr:{$eq:[{$year:"$date"},year]}},
@@ -340,7 +342,10 @@ export const statisticsForOneEmployee = async (req, res) => {
         { $match: { status: 4 } },
         { $group: { _id: null, sum: { $sum: "$bookingPrice" } } },
       ]);
-      const totalTurnOver = getTotal[0].sum;
+      let totalTurnOver = 0 
+      if(getTotal.length){
+         totalTurnOver = getTotal[0].sum;
+      }
       const information = await Employee.findOne({ _id: id }).exec();
       const totalBooking = await Booking.countDocuments({
         employeeId: id,
