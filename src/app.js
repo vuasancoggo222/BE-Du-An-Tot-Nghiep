@@ -70,11 +70,13 @@ io.on("connection", async (socket) => {
         if (err) return new Error("Authentication error");
         const role = decoded.role;
         const id = decoded._id
+        console.log(onlineUsers)
         addNewUser(id, socket.id,role);
         const user = getUser(id)
+        console.log(user)
         const admin = getAdmin()
         const employee = getEmployee()
-        if(user){
+        if(user){   
           const userList = await getUserListNotification(id)
           io.to(user.socketId).emit('userListNotification',userList)
         }
@@ -112,13 +114,14 @@ io.on("connection", async (socket) => {
       text: data.text,
       userId: data.userId,
     };
-    await newNotification(notification);
-    const sendNotification = await Notification.findOne({bookingId: data.id}).exec();
+    const response = await newNotification(notification);
+    console.log(response)
+    const sendNotification = await Notification.findOne({_id: response._id}).exec();
     const receiver = getUser(data.userId);
     if (receiver) {
       io.to(receiver.socketId).emit('myNewNotification',sendNotification)
       const userList = await getUserListNotification(data.userId)
-      io.to(user.socketId).emit('userListNotification',userList)
+      io.to(receiver.socketId).emit('userListNotification',userList)
     }
   });
   socket.on("disconnect", (reason) => {
