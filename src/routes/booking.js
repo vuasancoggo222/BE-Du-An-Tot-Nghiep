@@ -14,6 +14,7 @@ import { firebaseVerifyIdToken } from "../middlewares/firebaseVerifyIdToken";
 import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 const router = Router();
 router.post("/booking", firebaseVerifyIdToken, createBooking);
+router.post("/bookingAddByEmployee", createBooking);
 router.get("/booking", listBooking);
 router.get("/booking/:id", read);
 router.patch("/booking/:id", updateStatus);
