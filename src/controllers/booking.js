@@ -2,6 +2,7 @@ import { mongoose } from "mongoose";
 import Booking from "../models/booking";
 import User from "../models/user";
 import moment from "moment";
+import Voucher from "../models/voucher";
 
 export const createBooking = async (req, res) => {
   try {
@@ -65,6 +66,11 @@ export const updateStatus = async (req, res) => {
         { _id: booking.userId },
         { $push: { serviceUsed: booking.services } }
       );
+      const voucher  = await Voucher.findOne({_id : booking.voucher}).exec()
+      await Voucher.findOneAndUpdate({_id : booking.voucher},{quantity : voucher.quantity -1}).exec()
+      if(booking.userId){
+      await Voucher.findOneAndUpdate({_id : booking.voucher},{$push : {userUsed : booking.userId}}).exec()
+      }
       return res.json(booking);
     } else {
       const booking = await Booking.findOneAndUpdate(
