@@ -66,10 +66,12 @@ export const updateStatus = async (req, res) => {
         { _id: booking.userId },
         { $push: { serviceUsed: booking.services } }
       );
-      const voucher  = await Voucher.findOne({_id : booking.voucher}).exec()
-      await Voucher.findOneAndUpdate({_id : booking.voucher},{quantity : voucher.quantity -1}).exec()
-      if(booking.userId){
-      await Voucher.findOneAndUpdate({_id : booking.voucher},{$push : {userUsed : booking.userId}}).exec()
+      if(booking.voucher){
+        const voucher  = await Voucher.findOne({_id : booking.voucher}).exec()
+        await Voucher.findOneAndUpdate({_id : booking.voucher},{quantity : voucher.quantity -1}).exec()
+        if(booking.userId){
+        await Voucher.findOneAndUpdate({_id : booking.voucher},{$push : {userUsed : booking.userId}}).exec()
+      }
       }
       return res.json(booking);
     } else {

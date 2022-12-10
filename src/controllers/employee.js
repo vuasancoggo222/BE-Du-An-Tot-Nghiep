@@ -73,8 +73,9 @@ export const deleteEmployee = async (req, res) => {
       { _id: req.params.id },
       { new: true }
     ).exec();
+    await User.findOneAndDelete({employeeId : req.params.id}).exec()
     res.json({
-      message: "Success",
+      message: "Xoá nhân viên  thành công.",
       employee,
     });
   } catch (error) {

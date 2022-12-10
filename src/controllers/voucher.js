@@ -91,29 +91,36 @@ let useVoucher = async (req, res) => {
         message: "Voucher đã hết lượt sử dụng.",
       });
     }
-    if(voucher.userUsed.includes(booking.userId)){
+    if(booking){
+      if(voucher.userUsed.includes(booking.userId)){
+        return res.status(400).json({
+          message : "Người dùng đã sử dụng voucher này."
+        })
+      }
+      const serviceApply = booking.services.find(
+        (service) => service.serviceId == voucher.service.toString()
+      );
+      if (!serviceApply) {
+        return res.status(400).json({
+          message: "Voucher không áp dụng khuyến mãi cho dịch vụ này.",
+        });
+      } else {
+        if (voucher.type == "direct") {
+          serviceApply.price = serviceApply.price - voucher.discount;
+        } else if (voucher.type == "percentage") {
+          serviceApply.price =
+            serviceApply.price - (serviceApply.price / 100) * voucher.discount;
+        }
+      }
+      booking.bookingPrice = booking.services.reduce(
+        (previousValue, currentValue) => previousValue + currentValue.price,0);
+      booking['voucher'] = voucher._id
+    }
+    else{
       return res.status(400).json({
-        message : "Người dùng đã sử dụng voucher này."
+        message : "Đơn đặt lịch không tồn tại"
       })
     }
-    const serviceApply = booking.services.find(
-      (service) => service.serviceId == voucher.service.toString()
-    );
-    if (!serviceApply) {
-      return res.status(400).json({
-        message: "Voucher không áp dụng khuyến mãi cho dịch vụ này.",
-      });
-    } else {
-      if (voucher.type == "direct") {
-        serviceApply.price = serviceApply.price - voucher.discount;
-      } else if (voucher.type == "percentage") {
-        serviceApply.price =
-          serviceApply.price - (serviceApply.price / 100) * voucher.discount;
-      }
-    }
-    booking.bookingPrice = booking.services.reduce(
-      (previousValue, currentValue) => previousValue + currentValue.price,0);
-    booking['voucher'] = voucher._id
     return res.json(booking);
   } catch (error) {
     return res.json(error.message);
