@@ -13,6 +13,7 @@ export const createBooking = async (req, res) => {
       note: req.body.note,
       services: req.body.services,
       employeeId: req.body.employeeId,
+      status: req.body.status,
       date: req.body.date,
       time: req.body.time,
       age: req.body.age,

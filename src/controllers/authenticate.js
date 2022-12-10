@@ -46,10 +46,11 @@ export const signin = async (req,res) => {
     })
   }
   else if(user.status == 1){
-    const token = jwt.sign({_id: user._id,role : user.role},"datn",{expiresIn : "24h"},{algorithm :'HS256'})
+    const token = jwt.sign({_id: user._id,role : user.role,employeeId : user.employeeId},"datn",{expiresIn : "24h"},{algorithm :'HS256'})
     const refreshToken = jwt.sign({_id: user._id,role : user.role,employeeId : user.employeeId},"datn",{expiresIn : "7d"},{algorithm :'HS256'})
     const match = await bcrypt.compare(password,user.password)
     if(match){
+     if(user.employeeId){
       return res.json({
         message : 'Login Success',
         id : user._id,
@@ -58,8 +59,22 @@ export const signin = async (req,res) => {
         avatar : user.avatar,
         token,
         refreshToken,
-        role : user.role
+        role : user.role,
+        employeeId : user.employeeId
       })
+     }
+     else{
+      return res.json({
+        message : 'Login Success',
+        id : user._id,
+        phoneNumber : user.phoneNumber,
+        name : user.name,
+        avatar : user.avatar,
+        token,
+        refreshToken,
+        role : user.role,
+      })
+     }
     }
     else{
       return res.status(400).json({
