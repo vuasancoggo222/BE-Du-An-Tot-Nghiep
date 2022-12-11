@@ -59,7 +59,7 @@ let detailVoucher = async (req, res) => {
 };
 let listVoucher = async (req, res) => {
   try {
-    const voucher = await Voucher.find({}).sort({ createdAt: -1 }).exec();
+    const voucher = await Voucher.find({}).sort({ createdAt: -1 }).populate('service').exec();
     return res.json(voucher);
   } catch (error) {
     return res.json(error.message);
