@@ -20,7 +20,15 @@ export const listBlog = async (req,res) => {
         return res.json(error.message)
     }
 }
-
+export const listBlogLatest = async (req,res) => {
+    const { limit, start } = req.query
+    try {
+        const blogs = await Blog.find({}).sort({createdAt : -1}).limit(limit).skip(start-1).exec()
+        return res.json(blogs)
+    } catch (error) {
+        return res.json(error.message)
+    }
+}
 export const editBlog = async (req,res) => {
     try {
         const editBlogs = req.body

@@ -91,7 +91,8 @@ export const updateStatus = async (req, res) => {
 export const userBookingList = async (req, res) => {
   try {
     const listBooking = await Booking.find({ userId: req.params.id })
-      .populate("services")
+      .populate("services.serviceId")
+      .populate({path: "employeeId",select : ['name']})
       .exec();
     return res.json(listBooking);
   } catch (error) {
