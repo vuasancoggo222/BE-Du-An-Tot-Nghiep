@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import moment from 'moment';
 
 export const jwtVerifyToken = async (req,res,next) =>{
     const tokenHeaders = req.headers['authorization'] ? req.headers['authorization'].split(" ") : null
@@ -15,6 +16,12 @@ export const jwtVerifyToken = async (req,res,next) =>{
             return res.status(401).json(err)
         }
         req.user = decoded;
+        console.log();
+        if(moment().format('X') > req.user.exp){
+            return res.status(401).json({
+                message : "Vui lòng đănng nhập lại"
+            })
+        }
         console.log(req.user);
         next()
        })
