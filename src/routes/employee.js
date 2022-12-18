@@ -5,7 +5,7 @@ import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 const router = Router();
 router.get("/employees",list)
 router.post("/employees",jwtVerifyToken,isAdmin,create)    
-router.put("/employees/:id",jwtVerifyToken,isAdmin,update)
+router.patch("/employees/:id",jwtVerifyToken,isAdmin,update)
 router.delete("/employees/:id",jwtVerifyToken,isAdmin,deleteEmployee)
 router.get("/employees/:id",jwtVerifyToken,isAdmin,read)
 router.get("/employee/order-statistics",jwtVerifyToken,isAdmin,employeeOrderStatistics)

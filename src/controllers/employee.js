@@ -4,7 +4,7 @@ import Employee from "../models/employee";
 import User from "../models/user";
 export const list = async (req, res) => {
   try {
-    const employees = await Employee.find({}).exec();
+    const employees = await Employee.find({}).sort({createdAt : -1}).exec();
     res.json(employees);
   } catch (error) {
     res.status(400).json({
