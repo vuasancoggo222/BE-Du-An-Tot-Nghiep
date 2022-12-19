@@ -31,6 +31,7 @@ import admin from "firebase-admin";
 import serviceAccount from "../serviceAccountKey.json";
 import jwt from "jsonwebtoken";
 import {
+getEmployeeListNotification,
   getListAdminNotification,
   getUserListNotification,
   newNotification,
@@ -70,12 +71,12 @@ io.on("connection", async (socket) => {
         if (err) return new Error("Authentication error");
         const role = decoded.role;
         const id = decoded._id
-        console.log(onlineUsers)
+        const employeeId = decoded.employeeId
         addNewUser(id, socket.id,role);
+        console.log('Danh sách user :',onlineUsers);
         const user = getUser(id)
-        console.log(user)
         const admin = getAdmin()
-        const employee = getEmployee()
+        const employee = getEmployee(id)
         if(user){   
           const userList = await getUserListNotification(id)
           io.to(user.socketId).emit('userListNotification',userList)
@@ -84,9 +85,31 @@ io.on("connection", async (socket) => {
           const adminList = await getListAdminNotification()
           io.to(admin.socketId).emit('notification',adminList)
         }
+        if(employee){
+         const employeeList = await getEmployeeListNotification(employeeId)
+         io.to(employee.socketId).emit('employeeNotification',employeeList)
+        }
       });
     } else {
       return (new Error("Authentication error"));
+    }
+  })
+  socket.on('newEmployeeNotification',async (data) =>{
+    const notification = {
+      bookingId: data.id,
+      notificationType: 'employee',
+      text: data.text,
+      employeeId : data.employeeId
+    };
+    await newNotification(notification)
+    const sendNotification = await Notification.findOne({
+      bookingId: data.id,
+    }).exec();
+    const employee = getEmployee(data.employeeId)
+    if(employee){
+      io.to(employee.socketId).emit('myNewEmployeeNotification',sendNotification)
+      const employeeList = await getEmployeeListNotification(data.employeeId)
+      io.to(employee.socketId).emit('employeeNotification',employeeList)
     }
   })
   socket.on("newNotification", async (data) => {
@@ -115,7 +138,7 @@ io.on("connection", async (socket) => {
       userId: data.userId,
     };
     const response = await newNotification(notification);
-    console.log(response)
+
     const sendNotification = await Notification.findOne({_id: response._id}).exec();
     const receiver = getUser(data.userId);
     if (receiver) {

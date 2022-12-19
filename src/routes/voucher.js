@@ -2,7 +2,6 @@ import { Router } from "express";
 let router =  Router()
 import {createVoucher, detailVoucher, listVoucher, removeVoucher, updateVoucher, useVoucher} from '../controllers/voucher'
 
-
 router.post('/voucher/add',createVoucher)
 router.get('/vouchers',listVoucher)
 router.get('/voucher/:id',detailVoucher)

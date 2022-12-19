@@ -2,7 +2,6 @@ export let onlineUsers = []
 export const addNewUser = (id, socketId,socketRole) => {
     !onlineUsers.some((user) => user.id === id) &&
       onlineUsers.push({ id, socketId,socketRole });
-      console.log(onlineUsers);
   };
 
 export const getUser = (id) => {

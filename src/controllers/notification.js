@@ -38,6 +38,19 @@ export const getUserListNotification = async (userId) => {
   }
 };
 
+export const getEmployeeListNotification = async (employeeId) => {
+  try {
+    const employeeList = await Notification.find({employeeId}).sort({ createdAt: -1 }).exec();
+    const unRead = employeeList.filter(item => item.employeeId == employeeId && item.readed == false)
+    return {
+      notification: employeeList,
+      unRead : unRead.length,
+    }
+  } catch (error) {
+    return error
+  }
+};
+
 export const readNotification = async (req, res) => {
   try {
     const readNotification = await Notification.findOneAndUpdate(

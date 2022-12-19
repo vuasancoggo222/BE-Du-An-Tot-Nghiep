@@ -110,7 +110,7 @@ export const updateUserpassword = async (req, res) => {
       } else {
         const saltRounds = 10;
         newPassword = await bcrypt.hash(newPassword, saltRounds);
-        console.log(newPassword);
+        
         const update = {
           password: newPassword,
         };
@@ -133,7 +133,7 @@ export const updateUserpassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
-  console.log(req.user);
+ 
   const phoneNumber = req.user.phone_number.replace("+84", 0);
   try {
     if (password !== confirmPassword) {

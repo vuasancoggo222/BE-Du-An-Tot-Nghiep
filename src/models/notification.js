@@ -20,6 +20,10 @@ userId : {
     type : ObjectId,
     ref : 'Users'
 },
+employeeId : {
+    type : ObjectId,
+    ref : 'Employee'
+},
 readed: {
     type : Boolean,
     default : false

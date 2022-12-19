@@ -185,7 +185,7 @@ export const bookingGenderStatistics = async (req, res) => {
 };
 
 export const employeeBookingList2 = async (req, res) => {
-  console.log(req.user);
+ 
   try {
     const listBooking = await Booking.find({
       employeeId: req.user.employeeId,

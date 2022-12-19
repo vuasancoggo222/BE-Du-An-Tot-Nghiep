@@ -59,7 +59,7 @@ export const remove = async (req, res) => {
 export const read = async (req, res) => {
   try {
     const serviceId = await Service.findById(req.params.id).exec();
-    console.log(req.params.id);
+    
     res.json(serviceId);
   } catch (error) {
     res.status(400).json({
@@ -70,7 +70,7 @@ export const read = async (req, res) => {
 export const readslug = async (req, res) => {
   try {
     const serviceId = await Service.findOne({ slug: req.params.slug }).exec();
-    console.log(req.params.id);
+   
     res.json(serviceId);
   } catch (error) {
     res.status(400).json({

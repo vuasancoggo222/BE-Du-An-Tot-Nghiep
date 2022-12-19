@@ -16,13 +16,13 @@ export const jwtVerifyToken = async (req,res,next) =>{
             return res.status(401).json(err)
         }
         req.user = decoded;
-        console.log();
+       
         if(moment().format('X') > req.user.exp){
             return res.status(401).json({
                 message : "Vui lòng đănng nhập lại"
             })
         }
-        console.log(req.user);
+
         next()
        })
        } catch (error) {
