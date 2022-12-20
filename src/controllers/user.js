@@ -191,6 +191,7 @@ export const loyalCustomer = async (req,res) =>{
       }
       loyalCustomer = loyalCustomer.filter(item => item.usedQuantity > 0)
       loyalCustomer.sort((a, b) => b.usedQuantity - a.usedQuantity)
+      loyalCustomer = loyalCustomer.slice(0,9)
       return res.json(loyalCustomer)
     }
   } catch (error) {
