@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {list,create,update,read,deleteEmployee, employeeOrderStatistics, statisticsForOneEmployee} from "../controllers/employee";
-import { isAdmin, isEmployee } from "../middlewares/checkRole";
+import { isAdmin, isEmployee,isAdminOrEmployee } from "../middlewares/checkRole";
 import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 const router = Router();
 router.get("/employees",list)
