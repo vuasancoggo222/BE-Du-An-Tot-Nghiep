@@ -4,6 +4,7 @@ checkPhoneNumberValid,
   getOneUser,
   getUserProfile,
   listUser,
+  loyalCustomer,
   resetPassword,
   updateProfile,
   updateUser,
@@ -25,4 +26,5 @@ router.get("/users/acccount-status-statistics", userAccountStatistics);
 router.put("/update-password", jwtVerifyToken, updateUserpassword);
 router.put("/reset-password", firebaseVerifyIdToken, resetPassword);
 router.post('/check-valid-phone-number',checkPhoneNumberValid)
+router.get('/users/loyal-customer',loyalCustomer)
 export default router;
