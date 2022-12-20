@@ -177,3 +177,23 @@ export const checkPhoneNumberValid  = async (req,res) => {
     )
   }
 }
+
+export const loyalCustomer = async (req,res) =>{
+  const {month,year} = req.query
+  try {
+    if(!month && !year){
+      let loyalCustomer = await User.find({"serviceUsed.0": {
+        "$exists": true
+      },role : 0}).select("-password,").limit(10).exec()
+      
+      for(let i = 0 ; i < loyalCustomer.length; i++){
+          let usedQuantity = loyalCustomer[i].serviceUsed.length
+          loyalCustomer[i].usedQuantity = usedQuantity
+      }
+      loyalCustomer.sort((a, b) => b.usedQuantity - a.usedQuantity)
+      return res.json(loyalCustomer)
+    }
+  } catch (error) {
+    res.json(error)
+  }
+}
