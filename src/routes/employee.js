@@ -9,5 +9,5 @@ router.patch("/employees/:id",jwtVerifyToken,isAdmin,update)
 router.delete("/employees/:id",jwtVerifyToken,isAdmin,deleteEmployee)
 router.get("/employees/:id",jwtVerifyToken,isAdmin,read)
 router.get("/employee/order-statistics",jwtVerifyToken,isAdmin,employeeOrderStatistics)
-router.get("/statistics-for-employee/:id",jwtVerifyToken,isEmployee,statisticsForOneEmployee)
+router.get("/statistics-for-employee/:id",jwtVerifyToken,isAdminOrEmployeestatisticsForOneEmployee)
 export default router;
