@@ -1,5 +1,6 @@
 import User from "../models/user";
 import bcrypt from "bcrypt";
+import booking from "../models/booking";
 export const listUser = async (req, res) => {
   try {
     const listUser = await User.find({}).sort({ createdAt: -1 }).exec();
@@ -182,14 +183,13 @@ export const loyalCustomer = async (req,res) =>{
   const {month,year} = req.query
   try {
     if(!month && !year){
-      let loyalCustomer = await User.find({"serviceUsed.0": {
-        "$exists": true
-      },role : 0}).select("-password,").limit(10).exec()
+      let loyalCustomer = await User.find({}).select("-password").exec()
       
       for(let i = 0 ; i < loyalCustomer.length; i++){
-          let usedQuantity = loyalCustomer[i].serviceUsed.length
-          loyalCustomer[i].usedQuantity = usedQuantity
+          const data = await booking.countDocuments({userId : loyalCustomer[i]._id,status:4}).exec()
+          loyalCustomer[i].usedQuantity = data
       }
+      loyalCustomer = loyalCustomer.filter(item => item.usedQuantity > 0)
       loyalCustomer.sort((a, b) => b.usedQuantity - a.usedQuantity)
       return res.json(loyalCustomer)
     }
