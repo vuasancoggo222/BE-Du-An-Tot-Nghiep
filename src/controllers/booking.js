@@ -5,22 +5,41 @@ import moment from "moment";
 import Voucher from "../models/voucher";
 
 export const createBooking = async (req, res) => {
+  const {user} = req.query
   try {
-    const booking = await new Booking({
-      name: req.body.name,
-      userId: req.query.user || "",
-      phoneNumber: req.body.phoneNumber,
-      note: req.body.note,
-      services: req.body.services,
-      employeeId: req.body.employeeId,
-      status: req.body.status,
-      date: req.body.date,
-      time: req.body.time,
-      age: req.body.age,
-      gender: req.body.gender,
-      bookingPrice: req.body.bookingPrice,
-    }).save();
-    return res.json(booking);
+    if(!user){
+      const booking = await new Booking({
+        name: req.body.name,
+        phoneNumber: req.body.phoneNumber,
+        note: req.body.note,
+        services: req.body.services,
+        employeeId: req.body.employeeId,
+        status: req.body.status,
+        date: req.body.date,
+        time: req.body.time,
+        age: req.body.age,
+        gender: req.body.gender,
+        bookingPrice: req.body.bookingPrice,
+      }).save();
+      return res.json(booking);
+    }
+    else if(user){
+      const booking = await new Booking({
+        name: req.body.name,
+        phoneNumber: req.body.phoneNumber,
+        note: req.body.note,
+        userId : req.query.user,
+        services: req.body.services,
+        employeeId: req.body.employeeId,
+        status: req.body.status,
+        date: req.body.date,
+        time: req.body.time,
+        age: req.body.age,
+        gender: req.body.gender,
+        bookingPrice: req.body.bookingPrice,
+      }).save();
+      return res.json(booking);
+    }
   } catch (error) {
     return res.status(400).json({
       message: error.message,
