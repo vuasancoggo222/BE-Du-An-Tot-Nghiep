@@ -72,11 +72,11 @@ io.on("connection", async (socket) => {
         const role = decoded.role;
         const id = decoded._id
         const employeeId = decoded.employeeId
-        addNewUser(id, socket.id,role);
+        addNewUser(id, socket.id,role,employeeId);
         console.log('Danh sách user :',onlineUsers);
         const user = getUser(id)
         const admin = getAdmin()
-        const employee = getEmployee(id)
+        const employee = getEmployee(employeeId)
         if(user){   
           const userList = await getUserListNotification(id)
           io.to(user.socketId).emit('userListNotification',userList)
@@ -101,10 +101,7 @@ io.on("connection", async (socket) => {
       text: data.text,
       employeeId : data.employeeId
     };
-    await newNotification(notification)
-    const sendNotification = await Notification.findOne({
-      bookingId: data.id,
-    }).exec();
+    const sendNotification = await newNotification(notification)
     const employee = getEmployee(data.employeeId)
     if(employee){
       io.to(employee.socketId).emit('myNewEmployeeNotification',sendNotification)

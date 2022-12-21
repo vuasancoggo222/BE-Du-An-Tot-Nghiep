@@ -27,7 +27,7 @@ export const newNotification = async (data) => {
 
 export const getUserListNotification = async (userId) => {
   try {
-    const userListNotification = await Notification.find({userId}).sort({ createdAt: -1 }).exec();
+    const userListNotification = await Notification.find({userId}).populate("bookingId").sort({ createdAt: -1 }).exec();
     const unRead = userListNotification.filter(item => item.userId == userId && item.readed == false)
     return {
       notification: userListNotification,
@@ -40,7 +40,7 @@ export const getUserListNotification = async (userId) => {
 
 export const getEmployeeListNotification = async (employeeId) => {
   try {
-    const employeeList = await Notification.find({employeeId}).sort({ createdAt: -1 }).exec();
+    const employeeList = await Notification.find({employeeId}).populate("bookingId").sort({ createdAt: -1 }).exec();
     const unRead = employeeList.filter(item => item.employeeId == employeeId && item.readed == false)
     return {
       notification: employeeList,

@@ -1,7 +1,7 @@
 export let onlineUsers = []
-export const addNewUser = (id, socketId,socketRole) => {
+export const addNewUser = (id, socketId,socketRole,empId) => {
     !onlineUsers.some((user) => user.id === id) &&
-      onlineUsers.push({ id, socketId,socketRole });
+      onlineUsers.push({ id, socketId,socketRole,empId});
   };
 
 export const getUser = (id) => {
@@ -17,5 +17,5 @@ export const getAdmin = () => {
 }
 
 export const getEmployee = (id) =>{
-  return onlineUsers.find(user => user.id === id && user.socketRole == 1)
+  return onlineUsers.find(user => user.empId === id && user.socketRole == 1)
 }

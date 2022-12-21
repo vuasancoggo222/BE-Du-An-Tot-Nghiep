@@ -79,7 +79,7 @@ export const updateStatus = async (req, res) => {
     if (req.body.status == 4) {
       const booking = await Booking.findOneAndUpdate(
         { _id: req.params.id },
-        req.body
+        req.body,{new:true}
       ).exec();
       await User.findOneAndUpdate(
         { _id: booking.userId },
@@ -96,7 +96,7 @@ export const updateStatus = async (req, res) => {
     } else {
       const booking = await Booking.findOneAndUpdate(
         { _id: req.params.id },
-        req.body
+        req.body,{new:true}
       ).exec();
       return res.json(booking);
     }
