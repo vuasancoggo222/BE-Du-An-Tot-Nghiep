@@ -32,6 +32,7 @@ const bookingSchema = new Schema(
     userId: {
       type: ObjectId,
       ref: "Users",
+      required:false
     },
     employeeId: {
       type: ObjectId,

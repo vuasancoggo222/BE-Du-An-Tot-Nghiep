@@ -8,7 +8,7 @@ export const createBooking = async (req, res) => {
   try {
     const booking = await new Booking({
       name: req.body.name,
-      userId: req.query.user,
+      userId: req.query.user || "",
       phoneNumber: req.body.phoneNumber,
       note: req.body.note,
       services: req.body.services,
