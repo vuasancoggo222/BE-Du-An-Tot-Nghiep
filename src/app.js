@@ -113,9 +113,10 @@ io.on("connection", async (socket) => {
     }
   })
   socket.on("newNotification", async (data) => {
+    console.log(data);
     const notification = {
       bookingId: data.id,
-      notificationType: data.type || 'booking',
+      notificationType: data.type,
       text: data.text,
     };
     await newNotification(notification);

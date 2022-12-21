@@ -19,7 +19,7 @@ export const jwtVerifyToken = async (req,res,next) =>{
        
         if(moment().format('X') > req.user.exp){
             return res.status(401).json({
-                message : "Vui lòng đănng nhập lại"
+                message : "Vui lòng đăng nhập lại"
             })
         }
 

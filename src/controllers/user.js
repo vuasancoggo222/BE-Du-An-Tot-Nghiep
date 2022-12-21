@@ -183,7 +183,7 @@ export const loyalCustomer = async (req,res) =>{
   const {month,year} = req.query
   try {
     if(!month && !year){
-      let loyalCustomer = await User.find({}).select("-password").exec()
+      let loyalCustomer = await User.find({role : 0}).select("-password").exec()
       
       for(let i = 0 ; i < loyalCustomer.length; i++){
           const data = await booking.countDocuments({userId : loyalCustomer[i]._id,status:4}).exec()
