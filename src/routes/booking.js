@@ -13,7 +13,7 @@ import { isAdmin, isAdminOrEmployee, isEmployee } from "../middlewares/checkRole
 import { firebaseVerifyIdToken } from "../middlewares/firebaseVerifyIdToken";
 import { jwtVerifyToken } from "../middlewares/jwtVerifyToken";
 const router = Router();
-router.post("/booking", createBooking);
+router.post("/booking", firebaseVerifyIdToken, createBooking);
 router.get("/booking", listBooking);
 router.get("/booking/:id", read);
 router.patch("/booking/:id", updateStatus);
