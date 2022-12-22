@@ -7,5 +7,5 @@ import { isAdmin } from "../middlewares/checkRole";
 const router = Router();
 
 
-router.put("/read-notification/:id", readNotification);
+router.put("/read-notification/:id",jwtVerifyToken,readNotification);
 export default router;

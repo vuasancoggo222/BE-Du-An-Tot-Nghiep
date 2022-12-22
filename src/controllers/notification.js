@@ -8,7 +8,7 @@ export const getListAdminNotification = async () => {
       .exec();
     const unRead = await Notification.countDocuments({ readed: false, notificationType : 'admin' }).exec();
      return {
-      notfication: listNotification,
+      notification: listNotification,
       unRead,
     };
   } catch (error) {
@@ -58,7 +58,19 @@ export const readNotification = async (req, res) => {
       { readed: true },
       { new: true }
     ).exec();
-    res.json(readNotification);
+    console.log(readNotification);
+      if(readNotification.notificationType == "admin"){
+        const data = await getListAdminNotification()
+        return res.json(data)
+      }
+      else if(readNotification.notificationType == "user"){
+        const data = await getUserListNotification(readNotification.userId)
+        return res.json(data)
+      }
+      else if(readNotification.notificationType == "employee"){
+        const data = await getEmployeeListNotification(readNotification.employeeId)
+        return res.json(data)
+      }
   } catch (error) {
     res.status(400).json(error.message);
   }
