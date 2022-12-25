@@ -94,3 +94,53 @@ export const readNotification = async (req, res) => {
     res.status(400).json(error.message);
   }
 };
+
+export const readAllNotification = async (req, res) => {
+  const { role, _id, employeeId } = req.user;
+
+  try {
+    if (role == 0) {
+      const update = {
+        readed: true,
+      };
+      const notifications = await Notification.updateMany(
+        {
+          userId: _id,
+        },
+        update,
+        { new: true }
+      ).exec();
+      console.log(notifications);
+      const data = await getUserListNotification(userId);
+      return res.json(data);
+    } else if (role == 1) {
+      const update = {
+        readed: true,
+      };
+      const notifications = await Notification.updateMany(
+        {
+          employeeId: employeeId,
+        },
+        update,
+        { new: true }
+      ).exec();
+      console.log(notifications);
+      const data = await getEmployeeListNotification(employeeId);
+      return res.json(data);
+    } else if (role == 2) {
+      const update = {
+        readed: true,
+      };
+      const notifications = await Notification.updateMany(
+        {
+          notificationType: "admin",
+        },
+        update,
+        { new: true }
+      ).exec();
+      console.log(notifications);
+      const data = await getListAdminNotification();
+      return res.json(data);
+    }
+  } catch (error) {}
+};
