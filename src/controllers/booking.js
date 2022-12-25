@@ -5,9 +5,9 @@ import moment from "moment";
 import Voucher from "../models/voucher";
 
 export const createBooking = async (req, res) => {
-  const {user} = req.query
+  const { user } = req.query;
   try {
-    if(!user){
+    if (!user) {
       const booking = await new Booking({
         name: req.body.name,
         phoneNumber: req.body.phoneNumber,
@@ -22,13 +22,12 @@ export const createBooking = async (req, res) => {
         bookingPrice: req.body.bookingPrice,
       }).save();
       return res.json(booking);
-    }
-    else if(user){
+    } else if (user) {
       const booking = await new Booking({
         name: req.body.name,
         phoneNumber: req.body.phoneNumber,
         note: req.body.note,
-        userId : req.query.user,
+        userId: req.query.user,
         services: req.body.services,
         employeeId: req.body.employeeId,
         status: req.body.status,
@@ -79,25 +78,35 @@ export const updateStatus = async (req, res) => {
     if (req.body.status == 4) {
       const booking = await Booking.findOneAndUpdate(
         { _id: req.params.id },
-        req.body,{new:true}
+        req.body,
+        { new: true }
       ).exec();
       await User.findOneAndUpdate(
         { _id: booking.userId },
         { $push: { serviceUsed: booking.services } }
       );
-      if(booking.voucher){
-        const voucher  = await Voucher.findOne({_id : booking.voucher}).exec()
-        await Voucher.findOneAndUpdate({_id : booking.voucher},{quantity : voucher.quantity -1}).exec()
-        if(booking.userId){
-        await Voucher.findOneAndUpdate({_id : booking.voucher},{$push : {userUsed : booking.userId}}).exec()
-      }
+      if (booking.voucher) {
+        const voucher = await Voucher.findOne({ _id: booking.voucher }).exec();
+        await Voucher.findOneAndUpdate(
+          { _id: booking.voucher },
+          { quantity: voucher.quantity - 1 }
+        ).exec();
+        if (booking.userId) {
+          await Voucher.findOneAndUpdate(
+            { _id: booking.voucher },
+            { $push: { userUsed: booking.userId } }
+          ).exec();
+        }
       }
       return res.json(booking);
     } else {
       const booking = await Booking.findOneAndUpdate(
         { _id: req.params.id },
-        req.body,{new:true}
-      ).exec();
+        req.body,
+        { new: true }
+      )
+        .populate("employeeId")
+        .exec();
       return res.json(booking);
     }
   } catch (error) {
@@ -111,7 +120,7 @@ export const userBookingList = async (req, res) => {
   try {
     const listBooking = await Booking.find({ userId: req.params.id })
       .populate("services.serviceId")
-      .populate({path: "employeeId",select : ['name']})
+      .populate({ path: "employeeId", select: ["name"] })
       .exec();
     return res.json(listBooking);
   } catch (error) {
@@ -215,4 +224,3 @@ export const employeeBookingList2 = async (req, res) => {
     });
   }
 };
-
