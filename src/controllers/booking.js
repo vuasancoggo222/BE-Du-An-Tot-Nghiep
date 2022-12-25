@@ -224,3 +224,76 @@ export const employeeBookingList2 = async (req, res) => {
     });
   }
 };
+
+export const statusStatistic = async (req, res) => {
+  const month = Number(req.query.month);
+  const year = Number(req.query.year);
+  try {
+    if (!month && !year) {
+      const finished = await Booking.aggregate([
+        { $match: { $and: [{ $expr: { $eq: ["$status", 4] } }] } },
+      ]);
+      const canceled = await Booking.aggregate([
+        { $match: { $and: [{ $expr: { $eq: ["$status", 2] } }] } },
+      ]);
+      return res.json({
+        finished: finished.length,
+        canceled: canceled.length,
+      });
+    } else if (!month && year) {
+      const canceled = await Booking.aggregate([
+        {
+          $match: {
+            $and: [
+              { $expr: { $eq: [{ $year: "$date" }, year] } },
+              { $expr: { $eq: ["$status", 2] } },
+            ],
+          },
+        },
+      ]);
+      const finished = await Booking.aggregate([
+        {
+          $match: {
+            $and: [
+              { $expr: { $eq: [{ $year: "$date" }, year] } },
+              { $expr: { $eq: ["$status", 4] } },
+            ],
+          },
+        },
+      ]);
+      return res.json({
+        finished: finished.length,
+        canceled: canceled.length,
+      });
+    } else if (month && year) {
+      const canceled = await Booking.aggregate([
+        {
+          $match: {
+            $and: [
+              { $expr: { $eq: [{ $month: "$date" }, month] } },
+              { $expr: { $eq: [{ $year: "$date" }, year] } },
+              { $expr: { $eq: ["$status", 2] } },
+            ],
+          },
+        },
+      ]);
+      const finished = await Booking.aggregate([
+        {
+          $match: {
+            $and: [
+              { $expr: { $eq: [{ $month: "$date" }, month] } },
+              { $expr: { $eq: [{ $year: "$date" }, year] } },
+              { $expr: { $eq: ["$status", 4] } },
+            ],
+          },
+        },
+      ]);
+      return res.json({
+        finished: finished.length,
+        canceled: canceled.length,
+      });
+    }
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
