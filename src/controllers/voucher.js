@@ -74,13 +74,13 @@ let useVoucher = async (req, res) => {
   try {
     const booking = await Booking.findOne({ _id: id }).exec();
     const voucher = await Voucher.findOne({ code }).exec();
-    const expire = moment(voucher.expirationDate)
     
     if (!voucher) {
       return res.status(400).json({
         message: "Voucher không hợp lệ.",
       });
     }
+    const expire = moment(voucher.expirationDate) 
     if(now > expire.tz('Asia/Ho_Chi_Minh').format('X')){
       return res.status(400).json({
         message: "Voucher đã hết hạn sử dụng.",
