@@ -227,95 +227,37 @@ export const employeeBookingList2 = async (req, res) => {
 };
 
 export const statusStatistic = async (req, res) => {
-  const month = Number(req.query.month);
+  
   const year = Number(req.query.year);
   try {
-    let data = [];
-    const services = await Service.find({}).exec();
-    if (!month && !year) {
-      for (let i = 0; i < services.length; i++) {
-        const finished = await Booking.aggregate([
-          { $match: { $and: [{ $expr: { $eq: ["$status", 4] } }, { "services.serviceId": services[i]._id },] } },
-         
-        ]);
-        const canceled = await Booking.aggregate([
-          {
-            $match: {
-              $and: [
-                { $expr: { $eq: ["$status", 2] } },
-                { "services.serviceId": services[i]._id },
-              ],
-            },
-          },
-        ]);
-        const statistics = {
-          service: services[i],
-          finished: finished.length,
-          canceled: canceled.length,
-        };
-        data.push(statistics)
+    let allData = []
+   const serviceId = await Service.distinct('_id')
+    for(let svid of serviceId){
+      let datas = []
+      const service = await Service.findOne({_id : svid}).exec()
+      for(let i = 1 ; i<13; i++){
+        const documents = await Booking.aggregate([{$match:
+          {$and : [
+            {$expr:{$eq:[{$month:"$date"},i]}},
+            {$expr:{$eq:[{$year:"$date"},year]}},
+            {$expr:{$eq:["$status" ,2]}},
+            {"services.serviceId" :svid}
+          ]}
+        }])
+       
+        
+        datas.push(documents.length)
       }
-      return res.json(data);
-    } else if (!month && year) {
-      for (let i = 0; i < services.length; i++) {
-        const finished = await Booking.aggregate([
-          { $match: { $and: [{ $expr: { $eq: ["$status", 4] } }, { "services.serviceId": services[i]._id },{ $expr: { $eq: [{ $year: "$date" }, year] } }] } },
-         
-        ]);
-        const canceled = await Booking.aggregate([
-          {
-            $match: {
-              $and: [
-                { $expr: { $eq: ["$status", 2] } },
-                { $expr: { $eq: [{ $year: "$date" }, year] } },
-                { "services.serviceId": services[i]._id },
-              ],
-            },
-          },
-        ]);
-        const statistics = {
-          service: services[i],
-          finished: finished.length,
-          canceled: canceled.length,
-        };
-        data.push(statistics)
-      }
-      return res.json(data);
-    } else if (month && year) {
-      for (let i = 0; i < services.length; i++) {
-        const finished = await Booking.aggregate([
-          { $match: { $and: [
-            { $expr: { $eq: ["$status", 4] } },
-             { "services.serviceId": services[i]._id },
-             { $expr: { $eq: [{ $year: "$date" }, year] } },
-             { $expr: { $eq: [{ $month: "$date" }, month] } },]
-             } },
-         
-        ]);
-        const canceled = await Booking.aggregate([
-          {
-            $match: {
-              $and: [
-                { $expr: { $eq: ["$status", 2] } },
-                { $expr: { $eq: [{ $year: "$date" }, year] } },
-                { $expr: { $eq: [{ $month: "$date" }, month] } },
-                { "services.serviceId": services[i]._id },
-              ],
-            },
-          },
-        ]);
-        const statistics = {
-          service: services[i],
-          finished: finished.length,
-          canceled: canceled.length,
-        };
-        data.push(statistics)
-      }
-      return res.json(data);
-
+      allData.push({
+        service,
+        datas
+      })
     }
+    return res.json({
+      allData,
+      totalServices : serviceId.length
+    })
   } catch (error) {
-    console.log(error);
-    res.status(400).json(error);
+    return res.status(400).json(error.message)
   }
 };

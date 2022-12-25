@@ -77,7 +77,6 @@ export const readNotification = async (req, res) => {
       { readed: true },
       { new: true }
     ).exec();
-    console.log(readNotification);
     if (readNotification.notificationType == "admin") {
       const data = await getListAdminNotification();
       return res.json(data);
